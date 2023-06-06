@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ContainsIngredientRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,6 +20,7 @@ class ContainsIngredient
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"recipe_read"})
      */
     private $quantity;
 
@@ -31,6 +33,7 @@ class ContainsIngredient
     /**
      * @ORM\ManyToOne(targetEntity=Ingredient::class, inversedBy="containsIngredients")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"recipe_read"})
      */
     private $ingredient;
 

@@ -53,6 +53,7 @@ class Recipe
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"recipe_read"})
      */
     private $step;
 
@@ -70,6 +71,7 @@ class Recipe
 
     /**
      * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe")
+     * @Groups({"recipe_read"})
      */
     private $containsIngredients;
 

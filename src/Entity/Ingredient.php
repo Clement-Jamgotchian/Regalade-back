@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\IngredientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -16,11 +17,13 @@ class Ingredient
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"recipe_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=128)
+     * @Groups({"recipe_read"})
      */
     private $name;
 
@@ -31,6 +34,7 @@ class Ingredient
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"recipe_read"})
      */
     private $unit;
 
