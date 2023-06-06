@@ -6,6 +6,7 @@ use App\Entity\Ingredient;
 use App\Repository\IngredientRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -27,9 +28,12 @@ class IngredientController extends AbstractController
     /**
      * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
      */
-    public function read($id, IngredientRepository $ingredientRepository): JsonResponse
+    public function read(Ingredient $ingredient): JsonResponse
     {
+        if ($ingredient === null) {
+            return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
         
-        return $this->json($ingredientRepository->find($id), 200, [], ['groups' => ["ingredient_browse", "ingredient_read"]]);
+        return $this->json($ingredient, 200, [], ['groups' => ["ingredient_browse", "ingredient_read"]]);
     }
 }
