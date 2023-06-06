@@ -18,28 +18,33 @@ class Ingredient
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_browse"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_browse"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"ingredient_read"})
      */
     private $isCold;
 
     /**
      * @ORM\Column(type="string", length=10)
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_read"})
      */
     private $unit;
 
     /**
      * @ORM\ManyToOne(targetEntity=Department::class, inversedBy="ingredients")
+     * @Groups({"ingredient_read"})
      */
     private $department;
 
