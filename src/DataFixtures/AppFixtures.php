@@ -106,6 +106,8 @@ class AppFixtures extends Fixture
                 $manager->persist($newContainsIngredient);
 
             }
+
+            $recipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
         }
 
         $manager->flush();

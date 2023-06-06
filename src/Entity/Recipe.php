@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\RecipeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -16,31 +17,37 @@ class Recipe
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"recipe_browse"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=128)
+     * @Groups({"recipe_browse"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups({"recipe_browse"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=128, nullable=true)
+     * @Groups({"recipe_browse"})
      */
     private $picture;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"recipe_browse"})
      */
     private $cookingDuration;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"recipe_browse"})
      */
     private $setupDuration;
 
@@ -51,11 +58,13 @@ class Recipe
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"recipe_browse"})
      */
     private $difficulty;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="recipes")
+     * @Groups({"recipe_browse"})
      */
     private $category;
 
