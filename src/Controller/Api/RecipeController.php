@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Recipe;
 use App\Repository\RecipeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -26,9 +27,13 @@ class RecipeController extends AbstractController
     /**
      * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
      */
-    public function read($id, RecipeRepository $recipeRepository): JsonResponse
+    public function read(?Recipe $recipe): JsonResponse
     {
+        if ($recipe === null)
+        {
+            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
         
-        return $this->json($recipeRepository->find($id), 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
+        return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
     }
 }
