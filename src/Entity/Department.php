@@ -21,6 +21,7 @@ class Department
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"ingredient_read"})
      */
     private $name;
 
