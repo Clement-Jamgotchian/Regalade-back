@@ -20,6 +20,24 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ListController extends AbstractController
 {
+        /**
+     *  afficher la liste des repas
+     *
+     * @Route("", name="browse", methods = {"GET"})
+     */
+    public function browse(Request $request, UserRepository $userRepository, RecipeRepository $recipeRepository, UserService $userService):JsonResponse
+    {
+
+        /** @var User */
+        $user = $userService->getCurrentUser();
+        
+        $user->getRecipe();
+
+        $userRepository->remove($user, true);
+
+        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_CREATED);
+
+    }
     /**
      * ajouter un repas à la liste
      *
@@ -39,6 +57,27 @@ class ListController extends AbstractController
         $userRepository->add($user, true);
 
         return $this->json(["message" => "Recette ajoutée à la liste de repas"], Response::HTTP_CREATED);
+
+    }
+    /**
+     * suprimer un repas à la liste
+     *
+     * @Route("/{id}_delete", name="delete", methods = {"DELETE"})
+     */
+    public function remove(Request $request, UserRepository $userRepository, RecipeRepository $recipeRepository, UserService $userService):JsonResponse
+    {
+
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $recipeId = json_decode($request->getContent(), true)["id"];
+        $recipe = $recipeRepository->find($recipeId);
+
+        $user->removeRecipe($recipe);
+
+        $userRepository->remove($user, true);
+
+        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_CREATED);
 
     }
 }
