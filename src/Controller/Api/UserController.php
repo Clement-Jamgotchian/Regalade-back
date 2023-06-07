@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @Route("/api/users", name="app_api_user_")
+ * @Route("/api/users", name="app_api_users_")
  */
 class UserController extends AbstractController
 {
@@ -23,6 +23,7 @@ class UserController extends AbstractController
     public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasherInterface): JsonResponse
     {
 
+        dd($request->getUser());
         /** @var User */
         $newUser = $serializerInterface->deserialize($request->getContent(), User::class, 'json');
 
