@@ -7,6 +7,7 @@ use App\Entity\ContainsIngredient;
 use App\Entity\Department;
 use App\Entity\Ingredient;
 use App\Entity\Recipe;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -110,6 +111,21 @@ class AppFixtures extends Fixture
             $recipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
             $recipe->setRating(mt_rand(0,50) / 10);
         }
+
+        $newAdmin = new User();
+        $newAdmin->setEmail("admin@admin.com");
+        $newAdmin->setPassword('$2y$13$iHwEbpb8kYW0Q90T7g6dhe3O5T9UJ9VDwGmlCeMhL53L9juxe33lW');
+        $newAdmin->setNickname('admin');
+        $newAdmin->setRoles(['ROLE_ADMIN']);
+        $manager->persist($newAdmin);
+
+        $newUser = new User();
+        $newUser->setEmail("user@user.com");
+        $newUser->setPassword('$2y$13$iHwEbpb8kYW0Q90T7g6dhe3O5T9UJ9VDwGmlCeMhL53L9juxe33lW');
+        $newUser->setNickname('user');
+        $newUser->setRoles(['ROLE_USER']);
+        $manager->persist($newUser);
+
 
         $manager->flush();
     }
