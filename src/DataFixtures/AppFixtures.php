@@ -108,6 +108,7 @@ class AppFixtures extends Fixture
             }
 
             $recipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
+            $recipe->setRating(mt_rand(0,50) / 10);
         }
 
         $manager->flush();

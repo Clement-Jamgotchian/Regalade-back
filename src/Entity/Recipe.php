@@ -29,7 +29,7 @@ class Recipe
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"recipe_browse"})
+     * @Groups({"recipe_read"})
      */
     private $description;
 
@@ -74,6 +74,12 @@ class Recipe
      * @Groups({"recipe_read"})
      */
     private $containsIngredients;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"recipe_browse"})
+     */
+    private $rating;
 
     public function __construct()
     {
@@ -207,6 +213,18 @@ class Recipe
                 $containsIngredient->setRecipe(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): self
+    {
+        $this->rating = $rating;
 
         return $this;
     }
