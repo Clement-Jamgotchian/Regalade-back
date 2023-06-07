@@ -28,7 +28,7 @@ class IngredientController extends AbstractController
     /**
      * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
      */
-    public function read(Ingredient $ingredient): JsonResponse
+    public function read(?Ingredient $ingredient): JsonResponse
     {
         if ($ingredient === null) {
             return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_NOT_FOUND, []);
