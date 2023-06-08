@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ListController extends AbstractController
 {
-        /**
+    /**
      *  afficher la liste des repas
      *
      * @Route("", name="browse", methods = {"GET"})
@@ -33,11 +33,10 @@ class ListController extends AbstractController
         
         $user->getRecipe();
 
-        $userRepository->remove($user, true);
-
         return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_CREATED);
 
     }
+
     /**
      * ajouter un repas à la liste
      *
@@ -52,6 +51,10 @@ class ListController extends AbstractController
         $recipeId = json_decode($request->getContent(), true)["id"];
         $recipe = $recipeRepository->find($recipeId);
 
+        if ($recipe === null) {
+            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+
         $user->addRecipe($recipe);
 
         $userRepository->add($user, true);
@@ -59,25 +62,30 @@ class ListController extends AbstractController
         return $this->json(["message" => "Recette ajoutée à la liste de repas"], Response::HTTP_CREATED);
 
     }
+
     /**
-     * suprimer un repas à la liste
+     * supprimer un repas de la liste
      *
-     * @Route("/{id}_delete", name="delete", methods = {"DELETE"})
+     * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      */
-    public function remove(Request $request, UserRepository $userRepository, RecipeRepository $recipeRepository, UserService $userService):JsonResponse
+    public function remove(?Recipe $recipe, UserRepository $userRepository, UserService $userService):JsonResponse
     {
 
         /** @var User */
         $user = $userService->getCurrentUser();
 
-        $recipeId = json_decode($request->getContent(), true)["id"];
-        $recipe = $recipeRepository->find($recipeId);
+        if ($recipe === null) {
+            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+
+        if (!$user->getRecipe()->contains($recipe)) {
+            return $this->json(['message' => "Cette recette n'est pas dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
+        }
 
         $user->removeRecipe($recipe);
 
-        $userRepository->remove($user, true);
+        $userRepository->add($user, true);
 
-        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_CREATED);
-
+        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_OK);
     }
 }
