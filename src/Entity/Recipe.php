@@ -81,9 +81,15 @@ class Recipe
      */
     private $rating;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="recipe")
+     */
+    private $users;
+
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -225,6 +231,33 @@ class Recipe
     public function setRating(?float $rating): self
     {
         $this->rating = $rating;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeRecipe($this);
+        }
 
         return $this;
     }

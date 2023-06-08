@@ -126,6 +126,8 @@ class AppFixtures extends Fixture
         $newUser->setRoles(['ROLE_USER']);
         $manager->persist($newUser);
 
+        $newUser->addRecipe($allRecipes[0]);
+
 
         $manager->flush();
     }
