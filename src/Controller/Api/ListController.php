@@ -25,15 +25,15 @@ class ListController extends AbstractController
      *
      * @Route("", name="browse", methods = {"GET"})
      */
-    public function browse(Request $request, UserRepository $userRepository, RecipeRepository $recipeRepository, UserService $userService):JsonResponse
+    public function browse(UserService $userService):JsonResponse
     {
 
         /** @var User */
         $user = $userService->getCurrentUser();
         
-        $user->getRecipe();
+        $recipes = $user->getRecipe();
 
-        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_CREATED);
+        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
 
     }
 
