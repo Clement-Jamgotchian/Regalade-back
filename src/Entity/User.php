@@ -58,9 +58,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $recipe;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user")
+     */
+    private $carts;
+
     public function __construct()
     {
         $this->recipe = new ArrayCollection();
+        $this->carts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,6 +202,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeRecipe(Recipe $recipe): self
     {
         $this->recipe->removeElement($recipe);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cart>
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): self
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts[] = $cart;
+            $cart->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): self
+    {
+        if ($this->carts->removeElement($cart)) {
+            // set the owning side to null (unless already changed)
+            if ($cart->getUser() === $this) {
+                $cart->setUser(null);
+            }
+        }
 
         return $this;
     }
