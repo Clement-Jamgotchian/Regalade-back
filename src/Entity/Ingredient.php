@@ -39,6 +39,7 @@ class Ingredient
      * @ORM\Column(type="string", length=10)
      * @Groups({"recipe_read"})
      * @Groups({"ingredient_read"})
+     * @Groups({"ingredient_browse"})
      */
     private $unit;
 
@@ -55,6 +56,7 @@ class Ingredient
 
     /**
      * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="ingredient")
+     * 
      */
     private $carts;
 

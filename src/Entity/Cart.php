@@ -31,7 +31,7 @@ class Cart
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Ingredient::class, inversedBy="carts")
+     * @ORM\ManyToOne(targetEntity=Ingredient::class, inversedBy="carts", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"cart_browse"})
      */
