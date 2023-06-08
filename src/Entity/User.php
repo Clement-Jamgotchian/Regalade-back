@@ -60,6 +60,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
 
+     * @ORM\OneToMany(targetEntity=Fridge::class, mappedBy="user")
+     */
+    private $fridges;
+
+
+  /**
      * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user")
      */
     private $carts;
@@ -70,13 +76,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $members;
 
 
+
     public function __construct()
     {
         $this->recipe = new ArrayCollection();
 
+        $this->fridges = new ArrayCollection();
+
+
         $this->carts = new ArrayCollection();
 
         $this->members = new ArrayCollection();
+
 
     }
 
@@ -219,6 +230,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
 
+     * @return Collection<int, Fridge>
+     */
+    public function getFridges(): Collection
+    {
+        return $this->fridges;
+    }
+
+    public function addFridge(Fridge $fridge): self
+    {
+        if (!$this->fridges->contains($fridge)) {
+            $this->fridges[] = $fridge;
+            $fridge->setUser($this);
+        }
+    }
+
+
      * @return Collection<int, Cart>
      */
     public function getCarts(): Collection
@@ -232,6 +259,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->carts[] = $cart;
             $cart->setUser($this);
         }
+      
+      return $this;
     }
 
     /**
@@ -254,6 +283,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
+    public function removeFridge(Fridge $fridge): self
+    {
+        if ($this->fridges->removeElement($fridge)) {
+            // set the owning side to null (unless already changed)
+            if ($fridge->getUser() === $this) {
+                $fridge->setUser(null);
+            }
+        }
+      return $this;
+    }
+
+
     public function removeCart(Cart $cart): self
     {
         if ($this->carts->removeElement($cart)) {
@@ -262,6 +303,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $cart->setUser(null);
             }
         }
+      return $this;
     }
 
     public function removeMember(Member $member): self
