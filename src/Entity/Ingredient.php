@@ -39,6 +39,7 @@ class Ingredient
      * @ORM\Column(type="string", length=10)
      * @Groups({"recipe_read"})
      * @Groups({"ingredient_read"})
+     * @Groups({"ingredient_browse"})
      */
     private $unit;
 
@@ -53,9 +54,16 @@ class Ingredient
      */
     private $containsIngredients;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="ingredient")
+     * 
+     */
+    private $carts;
+
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
+        $this->carts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -135,6 +143,36 @@ class Ingredient
             // set the owning side to null (unless already changed)
             if ($containsIngredient->getIngredient() === $this) {
                 $containsIngredient->setIngredient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cart>
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): self
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts[] = $cart;
+            $cart->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): self
+    {
+        if ($this->carts->removeElement($cart)) {
+            // set the owning side to null (unless already changed)
+            if ($cart->getIngredient() === $this) {
+                $cart->setIngredient(null);
             }
         }
 
