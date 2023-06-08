@@ -58,9 +58,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $recipe;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Fridge::class, mappedBy="user")
+     */
+    private $fridges;
+
     public function __construct()
     {
         $this->recipe = new ArrayCollection();
+        $this->fridges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,6 +202,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeRecipe(Recipe $recipe): self
     {
         $this->recipe->removeElement($recipe);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Fridge>
+     */
+    public function getFridges(): Collection
+    {
+        return $this->fridges;
+    }
+
+    public function addFridge(Fridge $fridge): self
+    {
+        if (!$this->fridges->contains($fridge)) {
+            $this->fridges[] = $fridge;
+            $fridge->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFridge(Fridge $fridge): self
+    {
+        if ($this->fridges->removeElement($fridge)) {
+            // set the owning side to null (unless already changed)
+            if ($fridge->getUser() === $this) {
+                $fridge->setUser(null);
+            }
+        }
 
         return $this;
     }

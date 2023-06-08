@@ -53,9 +53,15 @@ class Ingredient
      */
     private $containsIngredients;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Fridge::class, mappedBy="ingredient")
+     */
+    private $fridges;
+
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
+        $this->fridges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -135,6 +141,36 @@ class Ingredient
             // set the owning side to null (unless already changed)
             if ($containsIngredient->getIngredient() === $this) {
                 $containsIngredient->setIngredient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Fridge>
+     */
+    public function getFridges(): Collection
+    {
+        return $this->fridges;
+    }
+
+    public function addFridge(Fridge $fridge): self
+    {
+        if (!$this->fridges->contains($fridge)) {
+            $this->fridges[] = $fridge;
+            $fridge->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFridge(Fridge $fridge): self
+    {
+        if ($this->fridges->removeElement($fridge)) {
+            // set the owning side to null (unless already changed)
+            if ($fridge->getIngredient() === $this) {
+                $fridge->setIngredient(null);
             }
         }
 
