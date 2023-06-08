@@ -64,6 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $carts;
 
+    /** 
      * @ORM\OneToMany(targetEntity=Member::class, mappedBy="user")
      */
     private $members;
@@ -225,12 +226,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->carts;
     }
 
-    public function addCart(Cart $cart): self
+    public function addCart(Cart $cart):self
     {
         if (!$this->carts->contains($cart)) {
             $this->carts[] = $cart;
             $cart->setUser($this);
+        }
+    }
 
+    /**
      * @return Collection<int, Member>
      */
     public function getMembers(): Collection
@@ -256,6 +260,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($cart->getUser() === $this) {
                 $cart->setUser(null);
+            }
+        }
+    }
 
     public function removeMember(Member $member): self
     {
@@ -270,3 +277,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 }
+

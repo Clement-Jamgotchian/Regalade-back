@@ -103,7 +103,7 @@ class CartController extends AbstractController
 
         $newCart = $serializerInterface->deserialize($request->getContent(), Cart::class, 'json');
 
-        dd($newCart);
+        // dd($newCart);
 
         $newCart->setUser($user);
 
