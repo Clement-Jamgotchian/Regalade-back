@@ -243,9 +243,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->fridges[] = $fridge;
             $fridge->setUser($this);
         }
+
+        return $this;
     }
 
-
+    /**
      * @return Collection<int, Cart>
      */
     public function getCarts(): Collection

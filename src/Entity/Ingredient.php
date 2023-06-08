@@ -172,6 +172,10 @@ class Ingredient
         if (!$this->fridges->contains($fridge)) {
             $this->fridges[] = $fridge;
             $fridge->setIngredient($this);
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Cart>
