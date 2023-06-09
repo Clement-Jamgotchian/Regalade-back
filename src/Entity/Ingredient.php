@@ -25,6 +25,7 @@ class Ingredient
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_read"})
      * @Groups({"ingredient_browse"})
      */
     private $name;
