@@ -8,6 +8,8 @@ use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\IngredientRepository;
 use App\Repository\UserRepository;
+use App\Services\AddEditDeleteService;
+use App\Services\AddOrDeleteOne;
 use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -76,18 +78,9 @@ class CartController extends AbstractController
     /**
      * @Route("", name="delete", methods={"DELETE"})
      */
-    public function delete(UserService $userService, CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface): JsonResponse
+    public function delete(AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
-        /** @var User */
-        $user = $userService->getCurrentUser();
-
-        $cart = $user->getCarts();
-
-        foreach ($cart as $cartElement) {
-            $cartRepository->remove($cartElement);
-        }
-
-        $entityManagerInterface->flush();
+        $addEditDeleteService->deleteAll(Cart::class, $cartRepository);
 
         return $this->json(["message" => "Tous les ingrédients ont été supprimé du panier"], Response::HTTP_OK);
     }
@@ -96,17 +89,37 @@ class CartController extends AbstractController
      * @Route("/add", name="addOne", methods={"POST"})
      * 
      */
-    public function addOne(Request $request, SerializerInterface $serializerInterface, UserService $userService, CartRepository $cartRepository): JsonResponse
+    public function addOne(AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
-        /** @var User */
-        $user = $userService->getCurrentUser();
 
-        $newCart = $serializerInterface->deserialize($request->getContent(), Cart::class, 'json');
-
-        $newCart->setUser($user);
-
-        $cartRepository->add($newCart, true);
+        $newCart = $addEditDeleteService->add($cartRepository, Cart::class);
 
         return $this->json($newCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
+    }
+
+    /**
+     * @Route("/{id}", name="deleteOne", requirements={"id"="\d+"}, methods={"DELETE"})
+     * 
+     */
+    public function deleteOne(?Cart $cart, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    {
+
+        $deletedCart = $addEditDeleteService->delete($cart, $cartRepository, Cart::class);
+
+        return $this->json(["message" => $deletedCart[0]], $deletedCart[1]);
+
+    }
+
+    /**
+     * @Route("/{id}", name="editOne", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+     * 
+     */
+    public function editOne(?Cart $cart, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    {
+
+        $EditedCart = $addEditDeleteService->edit($cart, $cartRepository, Cart::class);
+
+        return $this->json($EditedCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
+
     }
 }
