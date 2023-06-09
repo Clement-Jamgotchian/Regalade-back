@@ -82,7 +82,7 @@ class Recipe
     private $rating;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="recipe")
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="favoriteRecipes")
      */
     private $users;
 
@@ -247,7 +247,7 @@ class Recipe
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->addRecipe($this);
+            $user->addFavoriteRecipe($this);
         }
 
         return $this;
@@ -256,7 +256,7 @@ class Recipe
     public function removeUser(User $user): self
     {
         if ($this->users->removeElement($user)) {
-            $user->removeRecipe($this);
+            $user->removeFavoriteRecipe($this);
         }
 
         return $this;

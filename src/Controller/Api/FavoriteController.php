@@ -3,12 +3,9 @@
 namespace App\Controller\Api;
 
 use App\Entity\Recipe;
-use App\Entity\RecipeList;
 use App\Entity\User;
-use App\Repository\RecipeListRepository;
 use App\Repository\UserRepository;
 use App\Services\UserService;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,14 +14,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  *
- * @Route("/api/list", name="app_api_list_")
+ * @Route("/api/favorite", name="app_api_favorite_")
  */
-class ListController extends AbstractController
+class FavoriteController extends AbstractController
 {
     /**
-     *  afficher la liste des repas
+     *  afficher la liste des favoris
      *
-     * @Route("", name="browse", methods = {"GET"})
+     * @Route("", name="browse", methods={"GET"})
      */
     public function browse(UserService $userService):JsonResponse
     {
@@ -32,18 +29,18 @@ class ListController extends AbstractController
         /** @var User */
         $user = $userService->getCurrentUser();
         
-        $recipes = $user->getRecipeLists();
+        $recipes = $user->getFavoriteRecipes();
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse", "reciplist_browse"]]);
+        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
 
     }
 
     /**
-     * ajouter un repas à la liste
+     * ajouter un favoris à la liste
      *
      * @Route("/{id}", name="add", requirements={"id"="\d+"}, methods = {"POST"})
      */
-    public function add(?Recipe $recipe, UserRepository $userRepository, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
+    public function add(?Recipe $recipe, UserRepository $userRepository, UserService $userService):JsonResponse
     {
 
         /** @var User */
@@ -53,23 +50,20 @@ class ListController extends AbstractController
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
 
-        // TODO A MODIFIER
-        if ($user->getRecipe()->contains($recipe)) {
-            return $this->json(['message' => "Cette recette est déjà dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
+        if ($user->getFavoriteRecipes()->contains($recipe)) {
+            return $this->json(['message' => "Cette recette est déjà dans la liste des favoris"], Response::HTTP_BAD_REQUEST, []);
         }
 
-        $newRecipeList = new RecipeList();
-        $newRecipeList->setRecipe($recipe);
-        $newRecipeList->setUser($user);
+        $user->addFavoriteRecipe($recipe);
 
-        $recipeListRepository->add($newRecipeList, true);
+        $userRepository->add($user, true);
 
-        return $this->json(["message" => "Recette ajoutée à la liste de repas"], Response::HTTP_CREATED);
+        return $this->json(["message" => "Recette ajoutée à la liste de favoris"], Response::HTTP_CREATED);
 
     }
 
     /**
-     * supprimer un repas de la liste
+     * supprimer un favoris de la liste
      *
      * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      */
@@ -83,19 +77,19 @@ class ListController extends AbstractController
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
 
-        if (!$user->getRecipe()->contains($recipe)) {
-            return $this->json(['message' => "Cette recette n'est pas dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
+        if (!$user->getFavoriteRecipes()->contains($recipe)) {
+            return $this->json(['message' => "Cette recette n'est pas dans la liste des favoris"], Response::HTTP_BAD_REQUEST, []);
         }
 
-        $user->removeRecipe($recipe);
+        $user->removeFavoriteRecipe($recipe);
 
         $userRepository->add($user, true);
 
-        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_OK);
+        return $this->json(["message" => "Recette supprimée de la liste de favoris"], Response::HTTP_OK);
     }
 
     /**
-     * supprimer tous les repas de la liste
+     * supprimer tous les favoris de la liste
      *
      * @Route("", name="deleteAll", methods={"DELETE"})
      */
@@ -105,14 +99,14 @@ class ListController extends AbstractController
         /** @var User */
         $user = $userService->getCurrentUser();
 
-        $recipes = $user->getRecipe();
+        $recipes = $user->getFavoriteRecipes();
 
         foreach ($recipes as $recipe) {
-            $user->removeRecipe($recipe);
+            $user->removeFavoriteRecipe($recipe);
         }
 
         $entityManagerInterface->flush();
 
-        return $this->json(["message" => "Liste de repas purgée"], Response::HTTP_OK);
+        return $this->json(["message" => "Liste de favoris purgée"], Response::HTTP_OK);
     }
 }
