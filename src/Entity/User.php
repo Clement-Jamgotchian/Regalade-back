@@ -56,7 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\ManyToMany(targetEntity=Recipe::class, inversedBy="users")
      */
-    private $recipe;
+    private $favoriteRecipes;
 
     /**
 
@@ -75,11 +75,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $members;
 
+    /**
+     * @ORM\OneToMany(targetEntity=RecipeList::class, mappedBy="user")
+     */
+    private $recipeLists;
+
 
 
     public function __construct()
     {
-        $this->recipe = new ArrayCollection();
+        $this->favoriteRecipes = new ArrayCollection();
 
         $this->fridges = new ArrayCollection();
 
@@ -87,6 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->carts = new ArrayCollection();
 
         $this->members = new ArrayCollection();
+        $this->recipeLists = new ArrayCollection();
 
 
     }
@@ -207,23 +213,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Recipe>
      */
-    public function getRecipe(): Collection
+    public function getFavoriteRecipes(): Collection
     {
-        return $this->recipe;
+        return $this->favoriteRecipes;
     }
 
-    public function addRecipe(Recipe $recipe): self
+    public function addFavoriteRecipe(Recipe $favoriteRecipe): self
     {
-        if (!$this->recipe->contains($recipe)) {
-            $this->recipe[] = $recipe;
+        if (!$this->favoriteRecipes->contains($favoriteRecipe)) {
+            $this->favoriteRecipes[] = $favoriteRecipe;
         }
 
         return $this;
     }
 
-    public function removeRecipe(Recipe $recipe): self
+    public function removeFavoriteRecipe(Recipe $favoriteRecipe): self
     {
-        $this->recipe->removeElement($recipe);
+        $this->favoriteRecipes->removeElement($favoriteRecipe);
 
         return $this;
     }
@@ -315,6 +321,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($member->getUser() === $this) {
                 $member->setUser(null);
 
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecipeList>
+     */
+    public function getRecipeLists(): Collection
+    {
+        return $this->recipeLists;
+    }
+
+    public function addRecipeList(RecipeList $recipeList): self
+    {
+        if (!$this->recipeLists->contains($recipeList)) {
+            $this->recipeLists[] = $recipeList;
+            $recipeList->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipeList(RecipeList $recipeList): self
+    {
+        if ($this->recipeLists->removeElement($recipeList)) {
+            // set the owning side to null (unless already changed)
+            if ($recipeList->getUser() === $this) {
+                $recipeList->setUser(null);
             }
         }
 

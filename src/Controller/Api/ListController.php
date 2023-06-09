@@ -3,9 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\Recipe;
+use App\Entity\RecipeList;
 use App\Entity\User;
+use App\Repository\RecipeListRepository;
 use App\Repository\UserRepository;
 use App\Services\UserService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,9 +32,9 @@ class ListController extends AbstractController
         /** @var User */
         $user = $userService->getCurrentUser();
         
-        $recipes = $user->getRecipe();
+        $recipes = $user->getRecipeLists();
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
+        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse", "reciplist_browse"]]);
 
     }
 
@@ -40,7 +43,7 @@ class ListController extends AbstractController
      *
      * @Route("/{id}", name="add", requirements={"id"="\d+"}, methods = {"POST"})
      */
-    public function add(?Recipe $recipe, UserRepository $userRepository, UserService $userService):JsonResponse
+    public function add(?Recipe $recipe, UserRepository $userRepository, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
     {
 
         /** @var User */
@@ -50,13 +53,16 @@ class ListController extends AbstractController
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
 
+        // TODO A MODIFIER
         if ($user->getRecipe()->contains($recipe)) {
             return $this->json(['message' => "Cette recette est déjà dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
         }
 
-        $user->addRecipe($recipe);
+        $newRecipeList = new RecipeList();
+        $newRecipeList->setRecipe($recipe);
+        $newRecipeList->setUser($user);
 
-        $userRepository->add($user, true);
+        $recipeListRepository->add($newRecipeList, true);
 
         return $this->json(["message" => "Recette ajoutée à la liste de repas"], Response::HTTP_CREATED);
 
