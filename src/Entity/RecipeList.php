@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\RecipeListRepository;
-use symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

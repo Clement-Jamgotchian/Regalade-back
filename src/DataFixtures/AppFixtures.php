@@ -40,9 +40,9 @@ class AppFixtures extends Fixture
 
         $allIngredients = [];
 
-        for ($i=0; $i < 6; $i++) { 
+        for ($i=0; $i < 4; $i++) { 
             $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->dairyName());
+            $ingredient->setName($faker->dairyName());
             $ingredient->setUnit('cl');
             $ingredient->setDepartment($allDepartments[4]);
             $ingredient->setIsCold(1);
@@ -51,20 +51,9 @@ class AppFixtures extends Fixture
             $allIngredients[] = $ingredient;
         }
 
-        for ($i=0; $i < 22; $i++) { 
-            $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->vegetableName());
-            $ingredient->setUnit('pce');
-            $ingredient->setDepartment($allDepartments[3]);
-            $ingredient->setIsCold(0);
-            $manager->persist($ingredient);
-
-            $allIngredients[] = $ingredient;
-        }
-
         for ($i=0; $i < 20; $i++) { 
             $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->vegetableName());
+            $ingredient->setName($faker->vegetableName());
             $ingredient->setUnit('pce');
             $ingredient->setDepartment($allDepartments[3]);
             $ingredient->setIsCold(0);
@@ -73,9 +62,20 @@ class AppFixtures extends Fixture
             $allIngredients[] = $ingredient;
         }
 
-        for ($i=0; $i < 8; $i++) { 
+        for ($i=0; $i < 18; $i++) { 
             $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->meatName());
+            $ingredient->setName($faker->vegetableName());
+            $ingredient->setUnit('pce');
+            $ingredient->setDepartment($allDepartments[3]);
+            $ingredient->setIsCold(0);
+            $manager->persist($ingredient);
+
+            $allIngredients[] = $ingredient;
+        }
+
+        for ($i=0; $i < 6; $i++) { 
+            $ingredient = new Ingredient();
+            $ingredient->setName($faker->meatName());
             $ingredient->setUnit('gr');
             $ingredient->setDepartment($allDepartments[0]);
             $ingredient->setIsCold(1);
@@ -84,9 +84,9 @@ class AppFixtures extends Fixture
             $allIngredients[] = $ingredient;
         }
 
-        for ($i=0; $i < 5; $i++) { 
+        for ($i=0; $i < 4; $i++) { 
             $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->sauceName());
+            $ingredient->setName($faker->sauceName());
             $ingredient->setUnit('gr');
             $ingredient->setDepartment($allDepartments[6]);
             $ingredient->setIsCold(0);
@@ -109,7 +109,7 @@ class AppFixtures extends Fixture
 
         $allRecipes = [];
 
-        for ($i=0; $i < 18; $i++) { 
+        for ($i=0; $i < 15; $i++) { 
             $newRecipe = new Recipe();
             $newRecipe->setTitle($faker->unique()->foodName());
             $newRecipe->setDescription($faker->realText(50));
@@ -198,21 +198,21 @@ class AppFixtures extends Fixture
             }
 
             $random3 = mt_rand(0, 20);
-            for ($i=1; $i <= $random2; $i++) {
+            for ($i=1; $i <= $random3; $i++) {
                 $cart = new Cart();
                 $cart->setIngredient($allIngredients[mt_rand(0, count($allRecipes)-1)]);
                 $cart->setQuantity(mt_rand(1, 500));
                 $cart->setUser($user);
-                $manager->persist($user);
+                $manager->persist($cart);
             }
 
             $random4 = mt_rand(0, 15);
-            for ($i=1; $i <= $random2; $i++) {
+            for ($i=1; $i <= $random4; $i++) {
                 $fridge = new Fridge();
                 $fridge->setIngredient($allIngredients[mt_rand(0, count($allRecipes)-1)]);
                 $fridge->setQuantity(mt_rand(1, 500));
                 $fridge->setUser($user);
-                $manager->persist($user);
+                $manager->persist($fridge);
             }
         }
 

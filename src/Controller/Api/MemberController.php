@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/api/members", name="app_api_member_")
+ * @Route("/api/members", name="app_api_members_")
  */
 class MemberController extends AbstractController
 {
