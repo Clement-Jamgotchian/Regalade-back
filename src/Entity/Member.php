@@ -14,6 +14,7 @@ class Member
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"member_browse"})
      */
     private $id;
 
@@ -32,6 +33,7 @@ class Member
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="members")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"member_read"})
      */
     private $user;
 

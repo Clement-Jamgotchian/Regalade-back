@@ -20,12 +20,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"user_browse"})
+     * @Groups({"member_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"user_browse"})
+     * @Groups({"member_read"})
      */
     private $email;
 
@@ -44,6 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"user_browse"})
+     * @Groups({"member_read"})
      */
     private $nickname;
 
