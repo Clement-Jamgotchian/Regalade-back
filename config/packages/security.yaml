@@ -47,8 +47,13 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/users, roles: PUBLIC_ACCESS }
-        - { path: ^/api/recipes, roles: PUBLIC_ACCESS }
+        - { path: ^/api/user, roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/recipes, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/ingredients, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/departments, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/categories, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/allergens, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/diets, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
