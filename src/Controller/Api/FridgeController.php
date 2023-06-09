@@ -68,7 +68,7 @@ class FridgeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="deleteOne",requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+     * @Route("/{id}", name="edit",requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      */
     public function edit(?Fridge $fridge, FridgeRepository $fridgeRepository, AddEditDeleteService $addEditDeleteService): JsonResponse
     {

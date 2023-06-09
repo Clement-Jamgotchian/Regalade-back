@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\MemberRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,11 +19,13 @@ class Member
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"member_browse"})
      */
     private $nickname;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"member_browse"})
      */
     private $isAdult;
 

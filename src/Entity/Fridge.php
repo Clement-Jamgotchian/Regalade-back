@@ -14,6 +14,7 @@ class Fridge
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"fridge_browse"})
      */
     private $id;
 
