@@ -91,7 +91,7 @@ class ListController extends AbstractController
     /**
      * supprimer tous les repas de la liste
      *
-     * @Route("", name="delete", methods={"DELETE"})
+     * @Route("", name="deleteAll", methods={"DELETE"})
      */
     public function deleteAll(UserService $userService, UserRepository $userRepository, EntityManagerInterface $entityManagerInterface)
     {

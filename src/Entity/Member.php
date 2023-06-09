@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\MemberRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,22 +14,26 @@ class Member
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"member_browse"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"member_browse"})
      */
     private $nickname;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"member_browse"})
      */
     private $isAdult;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="members")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"member_read"})
      */
     private $user;
 
