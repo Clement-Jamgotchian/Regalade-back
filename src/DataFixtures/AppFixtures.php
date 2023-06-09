@@ -2,10 +2,14 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Cart;
 use App\Entity\Category;
 use App\Entity\ContainsIngredient;
 use App\Entity\Department;
+use App\Entity\Fridge;
+use App\Entity\RecipeList;
 use App\Entity\Ingredient;
+use App\Entity\Member;
 use App\Entity\Recipe;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -21,7 +25,7 @@ class AppFixtures extends Fixture
         $faker = \Faker\Factory::create('fr_FR');
         $faker->addProvider(new \FakerRestaurant\Provider\fr_FR\Restaurant($faker));
 
-        $departments = ["Frais", "Fruits et légumes", "Boucherie"];
+        $departments = ["Boucherie/Charcuterie", "Poissonnerie", "Boissons", "Fruits et légumes", "Frais", "Fromage", "Epicerie", "Boulangerie", "Surgelé"];
 
         $allDepartments = [];
 
@@ -36,10 +40,43 @@ class AppFixtures extends Fixture
 
         $allIngredients = [];
 
-        for ($i=0; $i < 5; $i++) { 
+        for ($i=0; $i < 6; $i++) { 
             $ingredient = new Ingredient();
             $ingredient->setName($faker->unique()->dairyName());
             $ingredient->setUnit('cl');
+            $ingredient->setDepartment($allDepartments[4]);
+            $ingredient->setIsCold(1);
+            $manager->persist($ingredient);
+
+            $allIngredients[] = $ingredient;
+        }
+
+        for ($i=0; $i < 22; $i++) { 
+            $ingredient = new Ingredient();
+            $ingredient->setName($faker->unique()->vegetableName());
+            $ingredient->setUnit('pce');
+            $ingredient->setDepartment($allDepartments[3]);
+            $ingredient->setIsCold(0);
+            $manager->persist($ingredient);
+
+            $allIngredients[] = $ingredient;
+        }
+
+        for ($i=0; $i < 20; $i++) { 
+            $ingredient = new Ingredient();
+            $ingredient->setName($faker->unique()->vegetableName());
+            $ingredient->setUnit('pce');
+            $ingredient->setDepartment($allDepartments[3]);
+            $ingredient->setIsCold(0);
+            $manager->persist($ingredient);
+
+            $allIngredients[] = $ingredient;
+        }
+
+        for ($i=0; $i < 8; $i++) { 
+            $ingredient = new Ingredient();
+            $ingredient->setName($faker->unique()->meatName());
+            $ingredient->setUnit('gr');
             $ingredient->setDepartment($allDepartments[0]);
             $ingredient->setIsCold(1);
             $manager->persist($ingredient);
@@ -47,24 +84,15 @@ class AppFixtures extends Fixture
             $allIngredients[] = $ingredient;
         }
 
-        for ($i=0; $i < 15; $i++) { 
+        for ($i=0; $i < 5; $i++) { 
             $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->vegetableName());
-            $ingredient->setUnit('/');
-            $ingredient->setDepartment($allDepartments[1]);
+            $ingredient->setName($faker->unique()->sauceName());
+            $ingredient->setUnit('gr');
+            $ingredient->setDepartment($allDepartments[6]);
             $ingredient->setIsCold(0);
             $manager->persist($ingredient);
 
             $allIngredients[] = $ingredient;
-        }
-
-        for ($i=0; $i < 4; $i++) { 
-            $ingredient = new Ingredient();
-            $ingredient->setName($faker->unique()->meatName());
-            $ingredient->setUnit('gr');
-            $ingredient->setDepartment($allDepartments[2]);
-            $ingredient->setIsCold(1);
-            $manager->persist($ingredient);
         }
 
         $categories = ['Entrée', "Plat", "Dessert"];
@@ -81,7 +109,7 @@ class AppFixtures extends Fixture
 
         $allRecipes = [];
 
-        for ($i=0; $i < 11; $i++) { 
+        for ($i=0; $i < 18; $i++) { 
             $newRecipe = new Recipe();
             $newRecipe->setTitle($faker->unique()->foodName());
             $newRecipe->setDescription($faker->realText(50));
@@ -96,7 +124,7 @@ class AppFixtures extends Fixture
 
         foreach ($allRecipes as $recipe) {
 
-            $randomNb = mt_rand(2, 6);
+            $randomNb = mt_rand(2, 7);
             for ($i=1; $i <= $randomNb; $i++) {
 
                 $newContainsIngredient = new ContainsIngredient();
@@ -112,22 +140,81 @@ class AppFixtures extends Fixture
             $recipe->setRating(mt_rand(0,50) / 10);
         }
 
+        /** @var User[] */
+        $users = [];
+
         $newAdmin = new User();
         $newAdmin->setEmail("admin@admin.com");
         $newAdmin->setPassword('$2y$13$iHwEbpb8kYW0Q90T7g6dhe3O5T9UJ9VDwGmlCeMhL53L9juxe33lW');
         $newAdmin->setNickname('admin');
         $newAdmin->setRoles(['ROLE_ADMIN']);
         $manager->persist($newAdmin);
+        $users[] = $newAdmin;
 
-        $newUser = new User();
-        $newUser->setEmail("user@user.com");
-        $newUser->setPassword('$2y$13$iHwEbpb8kYW0Q90T7g6dhe3O5T9UJ9VDwGmlCeMhL53L9juxe33lW');
-        $newUser->setNickname('user');
-        $newUser->setRoles(['ROLE_USER']);
-        $manager->persist($newUser);
+        $memberAdmin = new Member();
+        $memberAdmin->setNickname($newAdmin->getNickname());
+        $memberAdmin->setIsAdult(true);
+        $memberAdmin->setUser($newAdmin);
+        $manager->persist($memberAdmin);
 
-        $newUser->addRecipe($allRecipes[0]);
+        for ($i=0; $i < 50; $i++) { 
+            $newUser = new User();
+            $newUser->setEmail($faker->email());
+            $newUser->setPassword('$2y$13$iHwEbpb8kYW0Q90T7g6dhe3O5T9UJ9VDwGmlCeMhL53L9juxe33lW');
+            $newUser->setNickname($faker->firstName());
+            $newUser->setRoles(['ROLE_USER']);
+            $manager->persist($newUser);
+            $users[] = $newUser;
+    
+            $memberUser = new Member();
+            $memberUser->setNickname($newUser->getNickname());
+            $memberUser->setIsAdult(true);
+            $memberUser->setUser($newUser);
+            $manager->persist($memberUser);
+        }
 
+        foreach ($users as $user) {
+            $randomNb = mt_rand(0, 4);
+            for ($i=1; $i <= $randomNb; $i++) {
+                $member = new Member();
+                $member->setNickname($faker->firstName());
+                $member->setIsAdult(true);
+                $member->setUser($user);
+                $manager->persist($member);
+            }
+
+            $random = mt_rand(1,5);
+            for ($i=1; $i <= $random; $i++) {
+                $user->addFavoriteRecipe($allRecipes[mt_rand(0, count($allRecipes)-1)]);
+            }
+
+            $random2 = mt_rand(1,6);
+            for ($i=1; $i <= $random2; $i++) {
+                $newRecipeList = new RecipeList();
+                $newRecipeList->setRecipe($allRecipes[mt_rand(0, count($allRecipes)-1)]);
+                $newRecipeList->setUser($user);
+                $manager->persist($newRecipeList);
+        
+            }
+
+            $random3 = mt_rand(0, 20);
+            for ($i=1; $i <= $random2; $i++) {
+                $cart = new Cart();
+                $cart->setIngredient($allIngredients[mt_rand(0, count($allRecipes)-1)]);
+                $cart->setQuantity(mt_rand(1, 500));
+                $cart->setUser($user);
+                $manager->persist($user);
+            }
+
+            $random4 = mt_rand(0, 15);
+            for ($i=1; $i <= $random2; $i++) {
+                $fridge = new Fridge();
+                $fridge->setIngredient($allIngredients[mt_rand(0, count($allRecipes)-1)]);
+                $fridge->setQuantity(mt_rand(1, 500));
+                $fridge->setUser($user);
+                $manager->persist($user);
+            }
+        }
 
         $manager->flush();
     }
