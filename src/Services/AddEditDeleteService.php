@@ -23,14 +23,22 @@ class AddEditDeleteService
         $this->entityManagerInterface = $entityManagerInterface;
     }
 
-    public function add($repository, $entityClass)
+    public function add($repository, $entityClass, $newUser = null)
     {
         /** @var User */
         $user = $this->userService->getCurrentUser();
 
         $newAdd = $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json');
 
-        $newAdd->setUser($user);
+        if($newUser) {
+            $newAdd->setUser($newUser);
+        } else {
+            $newAdd->setUser($user);
+        }
+
+        if(method_exists($newAdd, 'isIsAdult') && $newAdd->isIsAdult() === null) {
+            $newAdd->setIsAdult(true);
+        }
 
         $repository->add($newAdd, true);
 

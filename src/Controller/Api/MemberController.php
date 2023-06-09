@@ -14,13 +14,26 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class MemberController extends AbstractController
 {
+    private $addEditDeleteService;
+    private $memberRepository;
+
+    public function __construct(AddEditDeleteService $addEditDeleteService, MemberRepository $memberRepository)
+    {
+        $this->memberRepository = $memberRepository;
+        $this->addEditDeleteService = $addEditDeleteService;
+    }
+    
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(AddEditDeleteService $addEditDeleteService, MemberRepository $memberRepository): JsonResponse
+    public function add($nickname = null, $newUser = null)
     {
-        $newMember = $addEditDeleteService->add($memberRepository, Member::class);
+        $newMember = $this->addEditDeleteService->add($this->memberRepository, Member::class, $newUser);
 
-        return $this->json($newMember, 200, [], ['groups' => ["member_browse"]]);
+        if ($nickname === null) {
+            return $this->json($newMember, 200, [], ['groups' => ["member_browse"]]);
+        }
     }
+
+
 }

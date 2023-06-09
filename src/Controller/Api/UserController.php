@@ -21,7 +21,7 @@ class UserController extends AbstractController
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasherInterface): JsonResponse
+    public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasherInterface, MemberController $memberController): JsonResponse
     {
 
         /** @var User */
@@ -30,6 +30,8 @@ class UserController extends AbstractController
         $newUser->setPassword($userPasswordHasherInterface->hashPassword($newUser, $newUser->getPassword()));
 
         $userRepository->add($newUser, true);
+
+        $memberController->add($newUser->getNickname(), $newUser);
 
         return $this->json($newUser, Response::HTTP_CREATED, [], ["groups" => ["user_browse"]]);
     }
