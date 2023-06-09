@@ -60,22 +60,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
 
+     * @ORM\OneToMany(targetEntity=Fridge::class, mappedBy="user")
+     */
+    private $fridges;
+
+
+  /**
      * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user")
      */
     private $carts;
 
+    /** 
      * @ORM\OneToMany(targetEntity=Member::class, mappedBy="user")
      */
     private $members;
+
 
 
     public function __construct()
     {
         $this->recipe = new ArrayCollection();
 
+        $this->fridges = new ArrayCollection();
+
+
         $this->carts = new ArrayCollection();
 
         $this->members = new ArrayCollection();
+
 
     }
 
@@ -218,6 +230,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
 
+     * @return Collection<int, Fridge>
+     */
+    public function getFridges(): Collection
+    {
+        return $this->fridges;
+    }
+
+    public function addFridge(Fridge $fridge): self
+    {
+        if (!$this->fridges->contains($fridge)) {
+            $this->fridges[] = $fridge;
+            $fridge->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Cart>
      */
     public function getCarts(): Collection
@@ -225,12 +255,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->carts;
     }
 
-    public function addCart(Cart $cart): self
+    public function addCart(Cart $cart):self
     {
         if (!$this->carts->contains($cart)) {
             $this->carts[] = $cart;
             $cart->setUser($this);
+        }
+      
+      return $this;
+    }
 
+    /**
      * @return Collection<int, Member>
      */
     public function getMembers(): Collection
@@ -250,12 +285,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
+    public function removeFridge(Fridge $fridge): self
+    {
+        if ($this->fridges->removeElement($fridge)) {
+            // set the owning side to null (unless already changed)
+            if ($fridge->getUser() === $this) {
+                $fridge->setUser(null);
+            }
+        }
+      return $this;
+    }
+
+
     public function removeCart(Cart $cart): self
     {
         if ($this->carts->removeElement($cart)) {
             // set the owning side to null (unless already changed)
             if ($cart->getUser() === $this) {
                 $cart->setUser(null);
+            }
+        }
+      return $this;
+    }
 
     public function removeMember(Member $member): self
     {
@@ -270,3 +321,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 }
+

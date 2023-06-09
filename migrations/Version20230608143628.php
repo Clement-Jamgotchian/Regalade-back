@@ -24,7 +24,7 @@ final class Version20230608143628 extends AbstractMigration
         $this->addSql('ALTER TABLE member ADD CONSTRAINT FK_70E4FA78A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE cart DROP FOREIGN KEY FK_BA388B7933FE08C');
         $this->addSql('ALTER TABLE cart DROP FOREIGN KEY FK_BA388B7A76ED395');
-        $this->addSql('DROP TABLE cart');
+
     }
 
     public function down(Schema $schema): void
