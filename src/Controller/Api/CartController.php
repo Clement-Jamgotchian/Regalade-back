@@ -33,7 +33,7 @@ class CartController extends AbstractController
 
         $cart = $user->getCarts();
 
-        return $this->json($cart, 200, [], ['groups' => ["ingredient_browse", "cart_browse"]]);
+        return $this->json($cart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
     }
 
     /**
@@ -70,7 +70,7 @@ class CartController extends AbstractController
 
         $entityManagerInterface->flush();
 
-        return $this->json($allCart, 200, [], ['groups' => ["ingredient_browse", "cart_browse"]]);
+        return $this->json($allCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
     }
 
     /**
@@ -103,12 +103,10 @@ class CartController extends AbstractController
 
         $newCart = $serializerInterface->deserialize($request->getContent(), Cart::class, 'json');
 
-        dd($newCart);
-
         $newCart->setUser($user);
 
         $cartRepository->add($newCart, true);
 
-        return $this->json($newCart, 200, [], ['groups' => ["ingredient_browse", "cart_browse"]]);
+        return $this->json($newCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
     }
 }
