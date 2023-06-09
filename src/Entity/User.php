@@ -59,14 +59,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $recipe;
 
     /**
+
      * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="user")
      */
     private $carts;
 
+     * @ORM\OneToMany(targetEntity=Member::class, mappedBy="user")
+     */
+    private $members;
+
+
     public function __construct()
     {
         $this->recipe = new ArrayCollection();
+
         $this->carts = new ArrayCollection();
+
+        $this->members = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -207,6 +217,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+
      * @return Collection<int, Cart>
      */
     public function getCarts(): Collection
@@ -219,10 +230,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->carts->contains($cart)) {
             $this->carts[] = $cart;
             $cart->setUser($this);
+
+     * @return Collection<int, Member>
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(Member $member): self
+    {
+        if (!$this->members->contains($member)) {
+            $this->members[] = $member;
+            $member->setUser($this);
+
         }
 
         return $this;
     }
+
 
     public function removeCart(Cart $cart): self
     {
@@ -230,6 +256,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($cart->getUser() === $this) {
                 $cart->setUser(null);
+
+    public function removeMember(Member $member): self
+    {
+        if ($this->members->removeElement($member)) {
+            // set the owning side to null (unless already changed)
+            if ($member->getUser() === $this) {
+                $member->setUser(null);
+
             }
         }
 
