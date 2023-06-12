@@ -7,6 +7,7 @@ use App\Repository\RecipeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -17,9 +18,13 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(RecipeRepository $recipeRepository): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository): JsonResponse
     {
-        $recipes = $recipeRepository->findAll();
+        if(!is_null($request->query->get('search'))) {
+            $recipes = $recipeRepository->findWhere($request->query->get('search'));
+        } else {
+            $recipes = $recipeRepository->findAll();
+        }
 
         return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
     }
@@ -36,4 +41,5 @@ class RecipeController extends AbstractController
         
         return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
     }
+
 }
