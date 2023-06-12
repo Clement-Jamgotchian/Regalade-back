@@ -80,6 +80,7 @@ class ListController extends AbstractController
 
         /** @var User */
         $user = $userService->getCurrentUser();
+
         $rmRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
       
         if ($recipe === null) {
@@ -94,6 +95,7 @@ class ListController extends AbstractController
         {
             return $this->json(['message' => "Cette recette n'est pas dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
         }
+
     }
 
     /**

@@ -70,7 +70,7 @@ class Recipe
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe")
+     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist"})
      * @Groups({"recipe_read"})
      */
     private $containsIngredients;
@@ -85,6 +85,12 @@ class Recipe
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="favoriteRecipes")
      */
     private $users;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recipes")
+     */
+    private $user;
+
 
     public function __construct()
     {
@@ -255,10 +261,24 @@ class Recipe
 
     public function removeUser(User $user): self
     {
-        if ($this->users->removeElement($user)) {
-            $user->removeFavoriteRecipe($this);
-        }
+    if ($this->users->removeElement($user)) {
+        $user->removeFavoriteRecipe($this);
+    }
+
+    return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
-    }
+    }   
+
 }
+
