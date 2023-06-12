@@ -26,3 +26,4 @@ services:
     App\Services\UserService:
         arguments: 
             [ '@security.token_storage' ]
+

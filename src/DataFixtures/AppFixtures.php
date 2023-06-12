@@ -117,6 +117,9 @@ class AppFixtures extends Fixture
             $newRecipe->setSetupDuration($faker->randomNumber(2));
             $newRecipe->setStep($faker->realText(250));
             $newRecipe->setDifficulty(mt_rand(1,3));
+            $newRecipe->setPicture('https://picsum.photos/200/300');
+            $newRecipe->setRating(mt_rand(10,50) / 10);
+            $newRecipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
             $manager->persist($newRecipe);
 
             $allRecipes[] = $newRecipe;
@@ -136,8 +139,6 @@ class AppFixtures extends Fixture
 
             }
 
-            $recipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
-            $recipe->setRating(mt_rand(0,50) / 10);
         }
 
         /** @var User[] */

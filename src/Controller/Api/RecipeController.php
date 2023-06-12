@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Recipe;
 use App\Repository\RecipeRepository;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,11 @@ class RecipeController extends AbstractController
             12
         );
 
-        return $this->json($recipesWithPagination, 200, [], ['groups' => ["recipe_browse"]]);
+        $toSend = [];
+        $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
+        $toSend['recipes'] = $recipesWithPagination;
+
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
     }
     
     /**
