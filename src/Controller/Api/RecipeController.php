@@ -4,9 +4,12 @@ namespace App\Controller\Api;
 
 use App\Entity\Recipe;
 use App\Repository\RecipeRepository;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -17,11 +20,25 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(RecipeRepository $recipeRepository): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface): JsonResponse
     {
-        $recipes = $recipeRepository->findAll();
+        if(!is_null($request->query->get('search'))) {
+            $recipes = $recipeRepository->findWhere($request->query->get('search'));
+        } else {
+            $recipes = $recipeRepository->findAll();
+        }
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
+        $recipesWithPagination = $paginatorInterface->paginate(
+            $recipes,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        $toSend = [];
+        $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
+        $toSend['recipes'] = $recipesWithPagination;
+
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
     }
     
     /**
@@ -36,4 +53,5 @@ class RecipeController extends AbstractController
         
         return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
     }
+
 }
