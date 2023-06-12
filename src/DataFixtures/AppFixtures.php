@@ -108,7 +108,7 @@ class AppFixtures extends Fixture
         }
 
         $allRecipes = [];
-
+        $sizes = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700];
         for ($i=0; $i < 15; $i++) { 
             $newRecipe = new Recipe();
             $newRecipe->setTitle($faker->unique()->foodName());
@@ -117,7 +117,7 @@ class AppFixtures extends Fixture
             $newRecipe->setSetupDuration($faker->randomNumber(2));
             $newRecipe->setStep($faker->realText(250));
             $newRecipe->setDifficulty(mt_rand(1,3));
-            $newRecipe->setPicture('https://picsum.photos/200/300');
+            $newRecipe->setPicture('https://picsum.photos/' . $sizes[$i]);
             $newRecipe->setRating(mt_rand(10,50) / 10);
             $newRecipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
             $manager->persist($newRecipe);
