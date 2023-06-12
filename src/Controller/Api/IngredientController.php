@@ -51,10 +51,10 @@ class IngredientController extends AbstractController
     }
 
     /**
-    * @Route("/{id}", name="editOne", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+    * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
     */
 
-    public function editOne(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
+    public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
     {
          $addEditDeleteService->edit($ingredient, $ingredientRepository, Ingredient::class);
  
