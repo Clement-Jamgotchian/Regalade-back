@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Recipe;
 use App\Repository\RecipeRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,7 +19,7 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(Request $request, RecipeRepository $recipeRepository): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface): JsonResponse
     {
         if(!is_null($request->query->get('search'))) {
             $recipes = $recipeRepository->findWhere($request->query->get('search'));
@@ -26,7 +27,13 @@ class RecipeController extends AbstractController
             $recipes = $recipeRepository->findAll();
         }
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
+        $recipesWithPagination = $paginatorInterface->paginate(
+            $recipes,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        return $this->json($recipesWithPagination, 200, [], ['groups' => ["recipe_browse"]]);
     }
     
     /**
