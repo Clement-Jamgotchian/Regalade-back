@@ -3,22 +3,15 @@
 namespace App\Controller\Api;
 
 use App\Entity\Cart;
-use App\Entity\Ingredient;
 use App\Entity\User;
 use App\Repository\CartRepository;
-use App\Repository\IngredientRepository;
-use App\Repository\UserRepository;
 use App\Services\AddEditDeleteService;
-use App\Services\AddOrDeleteOne;
 use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 /**
  * @Route("/api/cart", name="app_api_cart_")
