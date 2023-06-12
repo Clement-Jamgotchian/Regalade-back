@@ -6,7 +6,9 @@ use App\Entity\Recipe;
 use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\RecipeListRepository;
+use App\Repository\RecipeRepository;
 use App\Repository\UserRepository;
+use App\Services\AddEditDeleteService;
 use App\Services\UserService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,13 +50,13 @@ class ListController extends AbstractController
 
         /** @var User */
         $user = $userService->getCurrentUser();
+        $addRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
 
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
 
-        // TODO A MODIFIER
-        if ($user->getRecipe()->contains($recipe)) {
+        if ($user->getRecipeLists()->contains($addRecipe)) {
             return $this->json(['message' => "Cette recette est déjà dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
         }
 
@@ -79,27 +81,21 @@ class ListController extends AbstractController
         /** @var User */
         $user = $userService->getCurrentUser();
 
-        dd($recipeListRepository->findOneByRecipe($recipe, $user));
-        $recipeListRepository->find($recipe);
-
+        $rmRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
+      
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
-
-        if (!$user->getRecipe()->contains($recipe)) {
+        
+        if ($rmRecipe) {
+            $recipeListRepository->remove($rmRecipe, true);
+                return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_OK);
+        }
+        else
+        {
             return $this->json(['message' => "Cette recette n'est pas dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
         }
 
-        $recipeLists = $user->getRecipeLists();
-
-        foreach ($recipeLists as $list) {
-            if ($list->getRecipe() === $recipe);
-        }
-        $user->removeRecipeList($recipe);
-
-        $userRepository->add($user, true);
-
-        return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_OK);
     }
 
     /**
@@ -107,20 +103,11 @@ class ListController extends AbstractController
      *
      * @Route("", name="deleteAll", methods={"DELETE"})
      */
-    public function deleteAll(UserService $userService, UserRepository $userRepository, EntityManagerInterface $entityManagerInterface)
+    public function deleteAll(AddEditDeleteService $addEditDeleteService, RecipeListRepository $recipeListRepository): JsonResponse
     {
-        
-        /** @var User */
-        $user = $userService->getCurrentUser();
+        $addEditDeleteService->deleteAll(RecipeList::class, $recipeListRepository);
 
-        $recipes = $user->getRecipe();
-
-        foreach ($recipes as $recipe) {
-            $user->removeRecipe($recipe);
-        }
-
-        $entityManagerInterface->flush();
-
-        return $this->json(["message" => "Liste de repas purgée"], Response::HTTP_OK);
+        return $this->json(["message" => "Toutes les recettes ont été supprimée de la liste des repas"], Response::HTTP_OK);
     }
+    
 }
