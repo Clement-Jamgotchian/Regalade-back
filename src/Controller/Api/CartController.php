@@ -52,11 +52,11 @@ class CartController extends AbstractController
             $cartRepository->remove($cartElement);
         }
 
-        $recipesList = $user->getRecipe();
+        $recipesList = $user->getRecipeLists();
 
         $allCart = [];
         foreach ($recipesList as $recipe) {
-            $ingredients = $recipe->getContainsIngredients();
+            $ingredients = $recipe->getRecipe()->getContainsIngredients();
 
             foreach ($ingredients as $ingredient) {
                 $newCart = new Cart();
