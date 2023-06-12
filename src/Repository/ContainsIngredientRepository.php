@@ -39,6 +39,16 @@ class ContainsIngredientRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByRecipe($recipe): array
+   {
+       return $this->createQueryBuilder('c')
+           ->andWhere('c.recipe = :recipe')
+           ->setParameter('recipe', $recipe)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
 //    /**
 //     * @return ContainsIngredient[] Returns an array of ContainsIngredient objects
 //     */

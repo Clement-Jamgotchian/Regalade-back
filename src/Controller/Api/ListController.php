@@ -73,11 +73,14 @@ class ListController extends AbstractController
      *
      * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      */
-    public function delete(?Recipe $recipe, UserRepository $userRepository, UserService $userService):JsonResponse
+    public function delete(?Recipe $recipe, UserRepository $userRepository, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
     {
 
         /** @var User */
         $user = $userService->getCurrentUser();
+
+        dd($recipeListRepository->findOneByRecipe($recipe, $user));
+        $recipeListRepository->find($recipe);
 
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
@@ -87,7 +90,12 @@ class ListController extends AbstractController
             return $this->json(['message' => "Cette recette n'est pas dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
         }
 
-        $user->removeRecipe($recipe);
+        $recipeLists = $user->getRecipeLists();
+
+        foreach ($recipeLists as $list) {
+            if ($list->getRecipe() === $recipe);
+        }
+        $user->removeRecipeList($recipe);
 
         $userRepository->add($user, true);
 
