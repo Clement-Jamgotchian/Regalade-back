@@ -68,7 +68,7 @@ class RecipeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="edit", methods={"PUT", "PATCH"})
+     * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      */
     public function edit(?Recipe $recipe, UserService $userService, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository): JsonResponse
     {
@@ -89,7 +89,7 @@ class RecipeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="delete", methods={"DELETE"})
+     * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      */
     public function delete(?Recipe $recipe, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
     {
