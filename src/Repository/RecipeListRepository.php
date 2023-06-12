@@ -50,18 +50,6 @@ class RecipeListRepository extends ServiceEntityRepository
         ;
     }
 
-   public function findOneByRecipe($recipe, $user): ?RecipeList
-   {
-       return $this->createQueryBuilder('r')
-           ->andWhere('r.recipe = :recipe')
-           ->andWhere('r.user = :user')
-           ->setParameter('user', $user)
-           ->setParameter('recipe', $recipe)
-           ->getQuery()
-           ->getOneOrNullResult()
-       ;
-   }
-
 //    /**
 //     * @return RecipeList[] Returns an array of RecipeList objects
 //     */

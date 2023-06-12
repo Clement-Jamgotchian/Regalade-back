@@ -45,7 +45,7 @@ class IngredientController extends AbstractController
 
     public function add(AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
     {
-         $addEditDeleteService->add(Ingredient::class, $ingredientRepository);
+         $addEditDeleteService->add($ingredientRepository, Ingredient::class);
  
          return $this->json(["message" => "Ingrédient ajouté à la liste des ingrédients"], Response::HTTP_OK);
     }

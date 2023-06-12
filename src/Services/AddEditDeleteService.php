@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\Ingredient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +34,7 @@ class AddEditDeleteService
         if($newUser) {
             $newAdd->setUser($newUser);
         } else {
+            if ($entityClass !== Ingredient::class)
             $newAdd->setUser($user);
         }
 
