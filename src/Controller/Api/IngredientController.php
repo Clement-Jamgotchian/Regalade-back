@@ -4,6 +4,8 @@ namespace App\Controller\Api;
 
 use App\Entity\Ingredient;
 use App\Repository\IngredientRepository;
+use App\Services\AddEditDeleteService;
+use IntlChar;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,4 +38,27 @@ class IngredientController extends AbstractController
         
         return $this->json($ingredient, 200, [], ['groups' => ["ingredient_browse", "ingredient_read"]]);
     }
+
+    /**
+    * @Route("", name="add", requirements={"id"="\d+"}, methods={"POST"})
+    */
+
+    public function add(AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
+    {
+         $addEditDeleteService->add(Ingredient::class, $ingredientRepository);
+ 
+         return $this->json(["message" => "Ingrédient ajouté à la liste des ingrédients"], Response::HTTP_OK);
+    }
+
+    /**
+    * @Route("/{id}", name="editOne", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+    */
+
+    public function editOne(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
+    {
+         $addEditDeleteService->edit($ingredient, $ingredientRepository, Ingredient::class);
+ 
+         return $this->json(["message" => "Ingrédient édité"], Response::HTTP_OK);
+    }
+
 }
