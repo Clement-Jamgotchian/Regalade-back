@@ -2,20 +2,18 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\ContainsIngredient;
 use App\Entity\Recipe;
 use App\Repository\ContainsIngredientRepository;
 use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
 use App\Services\UserService;
-use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
+
 
 /**
  * @Route("/api/recipes", name="app_api_recipes_")
@@ -67,6 +65,27 @@ class RecipeController extends AbstractController
         $recipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
         
         return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
+    }
+
+    /**
+     * @Route("/{id}", name="edit", methods={"PUT", "PATCH"})
+     */
+    public function edit(?Recipe $recipe, UserService $userService, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository): JsonResponse
+    {
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        if ($recipe === null) {
+            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+
+        if (!$user->getRecipes()->contains($recipe)) {
+            return $this->json(['message' => "Cette recette ne vous appartient pas"], Response::HTTP_BAD_REQUEST, []);
+        }
+
+        $editedRecipe = $addEditDeleteService->edit($recipe, $recipeRepository, Recipe::class);
+        
+        return $this->json($editedRecipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
     }
 
     /**
