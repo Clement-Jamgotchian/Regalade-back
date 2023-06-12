@@ -52,13 +52,13 @@ class MemberController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="browse", requirements={"id"="\d+"}, methods={"GET"})
+     * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
      */
     public function read(?Member $member): JsonResponse
     {
         if ($member === null)
         {
-            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+            return $this->json(['message' => "Ce membre n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
         
         return $this->json($member, 200, [], ['groups' => ["member_browse", "member_read"]]);
@@ -68,10 +68,15 @@ class MemberController extends AbstractController
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      * 
      */
-    public function edit(?Member $member, AddEditDeleteService $addEditDeleteService, MemberRepository $memberRepository): JsonResponse
+    public function edit(?Member $member): JsonResponse
     {
 
-        $editedMember = $addEditDeleteService->edit($member, $memberRepository, Member::class);
+        if ($member === null)
+        {
+            return $this->json(['message' => "Ce membre n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+
+        $editedMember = $this->addEditDeleteService->edit($member, $this->memberRepository, Member::class);
 
         return $this->json($editedMember, 200, [], ['groups' => ["member_browse", "member_read"]]);
 
@@ -81,10 +86,15 @@ class MemberController extends AbstractController
      * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      * 
      */
-    public function delete(?Member $member, AddEditDeleteService $addEditDeleteService, MemberRepository $memberRepository): JsonResponse
+    public function delete(?Member $member): JsonResponse
     {
 
-        $deletedMember = $addEditDeleteService->delete($member, $memberRepository, Member::class);
+        if ($member === null)
+        {
+            return $this->json(['message' => "Ce membre n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+        
+        $deletedMember = $this->addEditDeleteService->delete($member, $this->memberRepository, Member::class);
 
         return $this->json(["message" => $deletedMember[0]], $deletedMember[1]);
 
