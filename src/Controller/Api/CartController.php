@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Cart;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Repository\FridgeRepository;
 use App\Services\AddEditDeleteService;
 use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +35,7 @@ class CartController extends AbstractController
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(UserService $userService, CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface): JsonResponse
+    public function add(UserService $userService, CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository): JsonResponse
     {
         /** @var User */
         $user = $userService->getCurrentUser();
@@ -49,22 +50,35 @@ class CartController extends AbstractController
 
         $allCart = [];
         foreach ($recipesList as $recipesListElement) {
-            $ingredients = $recipesListElement->getRecipe()->getContainsIngredients();
+            $containsIngredient = $recipesListElement->getRecipe()->getContainsIngredients();
 
             $portionsRecipe = $recipesListElement->getRecipe()->getPortions();
             $portionsWanted = $recipesListElement->getPortions();
 
             $proportion = $portionsWanted / $portionsRecipe;
 
-            foreach ($ingredients as $ingredient) {
-                $newCart = new Cart();
-                $newCart->setIngredient($ingredient->getIngredient());
-                $newCart->setUser($user);
-                $newCart->setQuantity(round($ingredient->getQuantity() * $proportion));
+            foreach ($containsIngredient as $containsIngredientElement) {
 
-                $allCart[] = $newCart;
+                $ingredientInFridge = $fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
 
-                $entityManagerInterface->persist($newCart);
+                if (!is_null($ingredientInFridge)) {
+                    $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
+
+                } else {
+                    $quantityToSet = $containsIngredientElement->getQuantity() * $proportion;
+                }
+
+                if ($quantityToSet > 0) {
+                    $newCart = new Cart();
+                    $newCart->setIngredient($containsIngredientElement->getIngredient());
+                    $newCart->setUser($user);
+                    $newCart->setQuantity(round($quantityToSet));
+
+                    $allCart[] = $newCart;
+
+                    $entityManagerInterface->persist($newCart);
+                }
+                
             }
         }
 

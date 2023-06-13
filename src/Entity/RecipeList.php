@@ -20,7 +20,7 @@ class RecipeList
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"reciplist_browse"})
+     * @Groups({"recipeList_browse"})
      */
     private $portions;
 
