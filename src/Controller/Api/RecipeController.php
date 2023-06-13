@@ -84,7 +84,7 @@ class RecipeController extends AbstractController
             $editedRecipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
 
         } else {
-            
+
             $editedRecipe = $addEditDeleteService->edit($recipe, $recipeRepository, Recipe::class);
         }
         
@@ -105,6 +105,27 @@ class RecipeController extends AbstractController
         $deletedRecipe = $addEditDeleteService->delete($recipe, $recipeRepository, Recipe::class);
 
         return $this->json(["message" => $deletedRecipe[0]], $deletedRecipe[1]);
+    }
+
+    /**
+     * @Route("/my", name="browseMy", methods={"GET"})
+     */
+    public function browseMy(UserService $userService, Request $request, PaginatorInterface $paginatorInterface): JsonResponse
+    {
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $recipesWithPagination = $paginatorInterface->paginate(
+            $user->getRecipes(),
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        $toSend = [];
+        $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
+        $toSend['recipes'] = $recipesWithPagination;
+
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
     }
 
 
