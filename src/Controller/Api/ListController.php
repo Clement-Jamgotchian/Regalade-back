@@ -50,7 +50,7 @@ class ListController extends AbstractController
         $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
         $toSend['recipes'] = $recipesWithPagination;
 
-        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse", "reciplist_browse"]]);
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse", "recipeList_browse"]]);
 
     }
 
@@ -122,6 +122,25 @@ class ListController extends AbstractController
         $addEditDeleteService->deleteAll(RecipeList::class, $recipeListRepository);
 
         return $this->json(["message" => "Toutes les recettes ont été supprimée de la liste des repas"], Response::HTTP_OK);
+    }
+
+       /**
+     * éditer un repas de la liste
+     *
+     * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+     */
+    public function edit(?Recipe $recipe,AddEditDeleteService $addEditDeleteService, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
+    {
+
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $editRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
+
+        $editedRecipe = $addEditDeleteService->edit($editRecipe, $recipeListRepository, RecipeList::class);
+
+        return $this->json($editedRecipe, 200, [], ['groups' => ["recipe_browse", "recipeList_browse"]]);
+
     }
     
 }
