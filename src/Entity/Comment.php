@@ -22,12 +22,14 @@ class Comment
     /**
      * @ORM\Column(type="text", nullable=true)
      * @Groups({"comment_read"})
+     * @Groups({"recipe_read"})
      */
     private $content;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups({"comment_read"})
+     * @Groups({"recipe_read"})
      */
     private $rating;
 
@@ -35,13 +37,13 @@ class Comment
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"comment_read"})
+     * @Groups({"recipe_read"})
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity=Recipe::class, inversedBy="comments")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"comment_read"})
      */
     private $recipe;
 

@@ -48,6 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Groups({"user_browse"})
      * @Groups({"member_read"})
      * @Groups({"comment_read"})
+     * @Groups({"recipe_read"})
      */
     private $nickname;
 
@@ -55,6 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=128, nullable=true)
      * @Groups({"user_browse"})
      * @Groups({"comment_read"})
+     * @Groups({"recipe_read"})
      */
     private $picture;
 
