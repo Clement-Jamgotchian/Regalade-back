@@ -35,13 +35,13 @@ class ListController extends AbstractController
         
         $recipesList = $user->getRecipeLists();
 
-        $recipes = [];
-        foreach ($recipesList as $recipeListElement) {
-            $recipes[] = $recipeListElement->getRecipe();
-        }
+        // $recipes = [];
+        // foreach ($recipesList as $recipeListElement) {
+        //     $recipes[] = $recipeListElement->getRecipe();
+        // }
 
         $recipesWithPagination = $paginatorInterface->paginate(
-            $recipes,
+            $recipesList,
             $request->query->getInt('page', 1),
             12
         );
@@ -77,6 +77,7 @@ class ListController extends AbstractController
         $newRecipeList = new RecipeList();
         $newRecipeList->setRecipe($recipe);
         $newRecipeList->setUser($user);
+        $newRecipeList->setPortions(count($user->getMembers()));
 
         $recipeListRepository->add($newRecipeList, true);
 

@@ -120,6 +120,7 @@ class AppFixtures extends Fixture
             $newRecipe->setPicture('https://picsum.photos/' . $sizes[$i]);
             $newRecipe->setRating(mt_rand(10,50) / 10);
             $newRecipe->setCategory($allCategories[mt_rand(0, count($allCategories)-1)]);
+            $newRecipe->setPortions(mt_rand(2,6));
             $manager->persist($newRecipe);
 
             $allRecipes[] = $newRecipe;

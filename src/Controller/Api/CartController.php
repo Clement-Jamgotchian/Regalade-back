@@ -48,14 +48,19 @@ class CartController extends AbstractController
         $recipesList = $user->getRecipeLists();
 
         $allCart = [];
-        foreach ($recipesList as $recipe) {
-            $ingredients = $recipe->getRecipe()->getContainsIngredients();
+        foreach ($recipesList as $recipesListElement) {
+            $ingredients = $recipesListElement->getRecipe()->getContainsIngredients();
+
+            $portionsRecipe = $recipesListElement->getRecipe()->getPortions();
+            $portionsWanted = $recipesListElement->getPortions();
+
+            $proportion = $portionsWanted / $portionsRecipe;
 
             foreach ($ingredients as $ingredient) {
                 $newCart = new Cart();
                 $newCart->setIngredient($ingredient->getIngredient());
                 $newCart->setUser($user);
-                $newCart->setQuantity($ingredient->getQuantity());
+                $newCart->setQuantity(round($ingredient->getQuantity() * $proportion));
 
                 $allCart[] = $newCart;
 
