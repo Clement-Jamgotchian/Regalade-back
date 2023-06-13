@@ -109,6 +109,12 @@ class Recipe
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"recipe_browse"})
+     */
+    private $portions;
+
 
 
     public function __construct()
@@ -379,6 +385,18 @@ class Recipe
                 $comment->setRecipe(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPortions(): ?int
+    {
+        return $this->portions;
+    }
+
+    public function setPortions(?int $portions): self
+    {
+        $this->portions = $portions;
 
         return $this;
     }   

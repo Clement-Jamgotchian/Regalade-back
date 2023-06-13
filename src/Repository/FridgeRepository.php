@@ -39,6 +39,7 @@ class FridgeRepository extends ServiceEntityRepository
         }
     }
 
+
     public function findOneByIngredient($ingredient, $user): ?Fridge
     {
         return $this->createQueryBuilder('f')
@@ -50,6 +51,7 @@ class FridgeRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
 
 //    /**
 //     * @return Fridge[] Returns an array of Fridge objects

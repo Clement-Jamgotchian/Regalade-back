@@ -3,8 +3,11 @@
 namespace App\Controller\Api;
 
 use App\Entity\Cart;
+use App\Entity\Ingredient;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Repository\FridgeRepository;
+use App\Repository\IngredientRepository;
 use App\Services\AddEditDeleteService;
 use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +37,7 @@ class CartController extends AbstractController
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(UserService $userService, CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface): JsonResponse
+    public function add(UserService $userService, CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository): JsonResponse
     {
         /** @var User */
         $user = $userService->getCurrentUser();
@@ -48,18 +51,35 @@ class CartController extends AbstractController
         $recipesList = $user->getRecipeLists();
 
         $allCart = [];
-        foreach ($recipesList as $recipe) {
-            $ingredients = $recipe->getRecipe()->getContainsIngredients();
+        foreach ($recipesList as $recipesListElement) {
+            $containsIngredient = $recipesListElement->getRecipe()->getContainsIngredients();
 
-            foreach ($ingredients as $ingredient) {
-                $newCart = new Cart();
-                $newCart->setIngredient($ingredient->getIngredient());
-                $newCart->setUser($user);
-                $newCart->setQuantity($ingredient->getQuantity());
+            $recipePortions = $recipesListElement->getRecipe()->getPortions();
+            $portionsWanted = $recipesListElement->getPortions();
 
-                $allCart[] = $newCart;
+            $proportion = $portionsWanted / $recipePortions;
 
-                $entityManagerInterface->persist($newCart);
+            foreach ($containsIngredient as $containsIngredientElement) {
+
+                $ingredientInFridge = $fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
+
+                if (!is_null($ingredientInFridge)) {
+                    $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
+                } else {
+                    $quantityToSet = $containsIngredientElement->getQuantity() * $proportion;
+                }
+
+                if ($quantityToSet > 0) {
+                    $newCart = new Cart();
+                    $newCart->setIngredient($containsIngredientElement->getIngredient());
+                    $newCart->setUser($user);
+                    $newCart->setQuantity(round($quantityToSet));
+
+                    $allCart[] = $newCart;
+
+                    $entityManagerInterface->persist($newCart);
+                }
+                
             }
         }
 
@@ -94,8 +114,12 @@ class CartController extends AbstractController
      * @Route("/{id}", name="deleteOne", requirements={"id"="\d+"}, methods={"DELETE"})
      * 
      */
-    public function deleteOne(?Cart $cart, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    public function deleteOne(?Ingredient $ingredient, UserService $userService, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $cart = $cartRepository->findOneByIngredient($ingredient, $user);
 
         $deletedCart = $addEditDeleteService->delete($cart, $cartRepository, Cart::class);
 
@@ -104,15 +128,43 @@ class CartController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="editOne", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+     * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      * 
      */
-    public function editOne(?Cart $cart, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    public function edit(?Ingredient $ingredient, UserService $userService, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $cart = $cartRepository->findOneByIngredient($ingredient, $user);
 
         $EditedCart = $addEditDeleteService->edit($cart, $cartRepository, Cart::class);
 
         return $this->json($EditedCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
+
+    }
+
+    /**
+     * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
+     * 
+     */
+    public function read(?Ingredient $ingredient, UserService $userService, CartRepository $cartRepository): JsonResponse
+    {
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $cart = $cartRepository->findOneByIngredient($ingredient, $user);
+
+        if ($ingredient === null)
+        {
+            return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+
+        if (!$cart) {
+            return $this->json(['message' => "Cet ingrédient n'est pas dans votre panier"], Response::HTTP_BAD_REQUEST, []);
+        }
+
+        return $this->json($cart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
 
     }
 }
