@@ -47,12 +47,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=64)
      * @Groups({"user_browse"})
      * @Groups({"member_read"})
+     * @Groups({"comment_read"})
      */
     private $nickname;
 
     /**
      * @ORM\Column(type="string", length=128, nullable=true)
      * @Groups({"user_browse"})
+     * @Groups({"comment_read"})
      */
     private $picture;
 
@@ -88,6 +90,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $recipes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user")
+     */
+    private $comments;
+
 
 
     public function __construct()
@@ -102,6 +109,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->members = new ArrayCollection();
         $this->recipeLists = new ArrayCollection();
         $this->recipes = new ArrayCollection();
+        $this->comments = new ArrayCollection();
 
     }
 
@@ -389,6 +397,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($recipe->getUser() === $this) {
                 $recipe->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
             }
         }
 
