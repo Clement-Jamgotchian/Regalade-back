@@ -39,6 +39,18 @@ class FridgeRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOneByIngredient($ingredient, $user): ?Fridge
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.ingredient = :ingredient')
+            ->andWhere('f.user = :user')
+            ->setParameter('user', $user)
+            ->setParameter('ingredient', $ingredient)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
 //    /**
 //     * @return Fridge[] Returns an array of Fridge objects
 //     */

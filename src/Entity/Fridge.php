@@ -21,6 +21,7 @@ class Fridge
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"fridge_browse"})
+     * @Groups({"fridge_ingredient_read"})
      */
     private $quantity;
 
@@ -28,6 +29,7 @@ class Fridge
      * @ORM\ManyToOne(targetEntity=Ingredient::class, inversedBy="fridges")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"fridge_browse"})
+     * @Groups({"fridge_ingredient_read"})
      */
     private $ingredient;
 
@@ -36,6 +38,12 @@ class Fridge
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     * @Groups({"fridge_ingredient_read"})
+     */
+    private $expireDate;
 
     public function getId(): ?int
     {
@@ -74,6 +82,18 @@ class Fridge
     public function setUser(?User $User): self
     {
         $this->user = $User;
+
+        return $this;
+    }
+
+    public function getExpireDate(): ?\DateTimeInterface
+    {
+        return $this->expireDate;
+    }
+
+    public function setExpireDate(?\DateTimeInterface $expireDate): self
+    {
+        $this->expireDate = $expireDate;
 
         return $this;
     }

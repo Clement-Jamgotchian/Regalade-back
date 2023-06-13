@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Fridge;
+use App\Entity\Ingredient;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
 use App\Repository\IngredientRepository;
@@ -34,6 +35,27 @@ class FridgeController extends AbstractController
         $fridge = $user->getFridges();
 
         return $this->json($fridge, 200, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
+    }
+
+    /**
+     * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
+     */
+    public function read(?ingredient $ingredient, UserService $userService, FridgeRepository $fridgeRepository):JsonResponse
+    {
+        /** @var User */
+        $user = $userService->getCurrentUser();
+
+        $ingredientToRead = $fridgeRepository->findOneByIngredient($ingredient, $user);
+
+        if ($ingredient === null) {
+            return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+        if (!$ingredientToRead) {
+            return $this->json(['message' => "Cet ingrédient n'est pas dans votre frigo"], Response::HTTP_BAD_REQUEST, []);
+        }
+        
+        return $this->json($ingredientToRead, 200, [], ['groups' => ["ingredient_browse", "ingredient_read", "fridge_ingredient_read"]]);
+
     }
 
     /**
