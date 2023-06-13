@@ -20,6 +20,7 @@ class RecipeList
 
     /**
      * @ORM\Column(type="date", nullable=true)
+     * @Groups({"recipeList_browse"})
      */
     private $date;
 
@@ -32,7 +33,7 @@ class RecipeList
     /**
      * @ORM\ManyToOne(targetEntity=Recipe::class, inversedBy="recipeLists")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"reciplist_browse"})
+     * @Groups({"recipeList_browse"})
      */
     private $recipe;
 
