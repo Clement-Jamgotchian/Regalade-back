@@ -6,14 +6,13 @@ use App\Entity\Recipe;
 use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\RecipeListRepository;
-use App\Repository\RecipeRepository;
 use App\Repository\UserRepository;
 use App\Services\AddEditDeleteService;
 use App\Services\UserService;
-use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,15 +27,30 @@ class ListController extends AbstractController
      *
      * @Route("", name="browse", methods = {"GET"})
      */
-    public function browse(UserService $userService):JsonResponse
+    public function browse(UserService $userService, Request $request, PaginatorInterface $paginatorInterface):JsonResponse
     {
 
         /** @var User */
         $user = $userService->getCurrentUser();
         
-        $recipes = $user->getRecipeLists();
+        $recipesList = $user->getRecipeLists();
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse", "reciplist_browse"]]);
+        $recipes = [];
+        foreach ($recipesList as $recipeListElement) {
+            $recipes[] = $recipeListElement->getRecipe();
+        }
+
+        $recipesWithPagination = $paginatorInterface->paginate(
+            $recipes,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        $toSend = [];
+        $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
+        $toSend['recipes'] = $recipesWithPagination;
+
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse", "reciplist_browse"]]);
 
     }
 
