@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Entity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\MemberRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -36,6 +38,22 @@ class Member
      * @Groups({"member_read"})
      */
     private $user;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Allergen::class, mappedBy="member")
+     */
+    private $allergens;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Diet::class, mappedBy="member")
+     */
+    private $diets;
+
+    public function __construct()
+    {
+        $this->allergens = new ArrayCollection();
+        $this->diets = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -74,6 +92,60 @@ class Member
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Allergen>
+     */
+    public function getAllergens(): Collection
+    {
+        return $this->allergens;
+    }
+
+    public function addAllergen(Allergen $allergen): self
+    {
+        if (!$this->allergens->contains($allergen)) {
+            $this->allergens[] = $allergen;
+            $allergen->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAllergen(Allergen $allergen): self
+    {
+        if ($this->allergens->removeElement($allergen)) {
+            $allergen->removeMember($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Diet>
+     */
+    public function getDiets(): Collection
+    {
+        return $this->diets;
+    }
+
+    public function addDiet(Diet $diet): self
+    {
+        if (!$this->diets->contains($diet)) {
+            $this->diets[] = $diet;
+            $diet->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiet(Diet $diet): self
+    {
+        if ($this->diets->removeElement($diet)) {
+            $diet->removeMember($this);
+        }
 
         return $this;
     }

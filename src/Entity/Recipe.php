@@ -94,16 +94,28 @@ class Recipe
     private $user;
 
     /**
+     * @ORM\ManyToMany(targetEntity=Allergen::class, mappedBy="recipe")
+     */
+    private $allergens;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Diet::class, mappedBy="recipe")
+     */
+    private $diets;
+
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="recipe")
      * @Groups({"recipe_read"})
      */
     private $comments;
 
 
+
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->allergens = new ArrayCollection();
+        $this->diets = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
@@ -290,6 +302,23 @@ class Recipe
     }
 
     /**
+     * @return Collection<int, Allergen>
+     */
+    public function getAllergens(): Collection
+    {
+        return $this->allergens;
+    }
+
+    public function addAllergen(Allergen $allergen): self
+    {
+        if (!$this->allergens->contains($allergen)) {
+            $this->allergens[] = $allergen;
+            $allergen->addRecipe($this); 
+        }
+       return $this;
+    }
+
+    /**
      * @return Collection<int, Comment>
      */
     public function getComments(): Collection
@@ -303,8 +332,42 @@ class Recipe
             $this->comments[] = $comment;
             $comment->setRecipe($this);
         }
+        return $this;
+    }
+
+    public function removeAllergen(Allergen $allergen): self
+    {
+        if ($this->allergens->removeElement($allergen)) {
+            $allergen->removeRecipe($this);
+        }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Diet>
+     */
+    public function getDiets(): Collection
+    {
+        return $this->diets;
+    }
+
+    public function addDiet(Diet $diet): self
+    {
+        if (!$this->diets->contains($diet)) {
+            $this->diets[] = $diet;
+            $diet->addRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiet(Diet $diet): self
+    {
+        if ($this->diets->removeElement($diet)) {
+            $diet->removeRecipe($this);
+        }
+      return $this;
     }
 
     public function removeComment(Comment $comment): self
