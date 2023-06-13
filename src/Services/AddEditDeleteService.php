@@ -34,8 +34,9 @@ class AddEditDeleteService
         if($newUser) {
             $newAdd->setUser($newUser);
         } else {
-            if ($entityClass !== Ingredient::class)
-            $newAdd->setUser($user);
+            if ($entityClass !== Ingredient::class) {
+                $newAdd->setUser($user);
+            }
         }
 
         if(method_exists($newAdd, 'isIsAdult') && $newAdd->isIsAdult() === null) {
