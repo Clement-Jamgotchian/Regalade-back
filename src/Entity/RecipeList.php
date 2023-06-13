@@ -19,10 +19,10 @@ class RecipeList
     private $id;
 
     /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups({"recipeList_browse"})
      */
-    private $date;
+    private $portions;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recipeLists")
@@ -42,14 +42,14 @@ class RecipeList
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getPortions(): ?int
     {
-        return $this->date;
+        return $this->portions;
     }
 
-    public function setDate(?\DateTimeInterface $date): self
+    public function setPortions(?int $portions): self
     {
-        $this->date = $date;
+        $this->portions = $portions;
 
         return $this;
     }
