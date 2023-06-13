@@ -20,7 +20,6 @@ class RecipeList
 
     /**
      * @ORM\Column(type="date", nullable=true)
-     * @Groups({"reciplist_browse"})
      */
     private $date;
 
