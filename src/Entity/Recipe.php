@@ -91,11 +91,23 @@ class Recipe
      */
     private $user;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Allergen::class, mappedBy="recipe")
+     */
+    private $allergens;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Diet::class, mappedBy="recipe")
+     */
+    private $diets;
+
 
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->allergens = new ArrayCollection();
+        $this->diets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -276,6 +288,60 @@ class Recipe
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Allergen>
+     */
+    public function getAllergens(): Collection
+    {
+        return $this->allergens;
+    }
+
+    public function addAllergen(Allergen $allergen): self
+    {
+        if (!$this->allergens->contains($allergen)) {
+            $this->allergens[] = $allergen;
+            $allergen->addRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAllergen(Allergen $allergen): self
+    {
+        if ($this->allergens->removeElement($allergen)) {
+            $allergen->removeRecipe($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Diet>
+     */
+    public function getDiets(): Collection
+    {
+        return $this->diets;
+    }
+
+    public function addDiet(Diet $diet): self
+    {
+        if (!$this->diets->contains($diet)) {
+            $this->diets[] = $diet;
+            $diet->addRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiet(Diet $diet): self
+    {
+        if ($this->diets->removeElement($diet)) {
+            $diet->removeRecipe($this);
+        }
 
         return $this;
     }   
