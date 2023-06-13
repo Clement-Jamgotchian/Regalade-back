@@ -80,10 +80,13 @@ class RecipeController extends AbstractController
         }
 
         if (!$user->getRecipes()->contains($recipe)) {
-            return $this->json(['message' => "Cette recette ne vous appartient pas"], Response::HTTP_BAD_REQUEST, []);
-        }
 
-        $editedRecipe = $addEditDeleteService->edit($recipe, $recipeRepository, Recipe::class);
+            $editedRecipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
+
+        } else {
+            
+            $editedRecipe = $addEditDeleteService->edit($recipe, $recipeRepository, Recipe::class);
+        }
         
         return $this->json($editedRecipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
     }
