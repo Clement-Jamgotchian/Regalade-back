@@ -7,8 +7,10 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,7 +25,7 @@ class FavoriteController extends AbstractController
      *
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(UserService $userService):JsonResponse
+    public function browse(UserService $userService, Request $request, PaginatorInterface $paginatorInterface):JsonResponse
     {
 
         /** @var User */
@@ -31,7 +33,17 @@ class FavoriteController extends AbstractController
         
         $recipes = $user->getFavoriteRecipes();
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
+        $recipesWithPagination = $paginatorInterface->paginate(
+            $recipes,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        $toSend = [];
+        $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
+        $toSend['recipes'] = $recipesWithPagination;
+
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
 
     }
 
