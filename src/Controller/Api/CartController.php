@@ -52,10 +52,10 @@ class CartController extends AbstractController
         foreach ($recipesList as $recipesListElement) {
             $containsIngredient = $recipesListElement->getRecipe()->getContainsIngredients();
 
-            $portionsRecipe = $recipesListElement->getRecipe()->getPortions();
+            $recipePortions = $recipesListElement->getRecipe()->getPortions();
             $portionsWanted = $recipesListElement->getPortions();
 
-            $proportion = $portionsWanted / $portionsRecipe;
+            $proportion = $portionsWanted / $recipePortions;
 
             foreach ($containsIngredient as $containsIngredientElement) {
 
@@ -63,7 +63,6 @@ class CartController extends AbstractController
 
                 if (!is_null($ingredientInFridge)) {
                     $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
-
                 } else {
                     $quantityToSet = $containsIngredientElement->getQuantity() * $proportion;
                 }

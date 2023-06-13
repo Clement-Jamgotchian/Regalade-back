@@ -35,11 +35,6 @@ class ListController extends AbstractController
         
         $recipesList = $user->getRecipeLists();
 
-        // $recipes = [];
-        // foreach ($recipesList as $recipeListElement) {
-        //     $recipes[] = $recipeListElement->getRecipe();
-        // }
-
         $recipesWithPagination = $paginatorInterface->paginate(
             $recipesList,
             $request->query->getInt('page', 1),
@@ -48,9 +43,9 @@ class ListController extends AbstractController
 
         $toSend = [];
         $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
-        $toSend['recipes'] = $recipesWithPagination;
+        $toSend['recipesList'] = $recipesWithPagination;
 
-        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse", "reciplist_browse"]]);
+        return $this->json($toSend, 200, [], ['groups' => ["recipe_browse", "recipeList_browse"]]);
 
     }
 
