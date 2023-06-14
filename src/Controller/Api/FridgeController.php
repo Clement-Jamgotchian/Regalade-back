@@ -5,7 +5,9 @@ namespace App\Controller\Api;
 use App\Entity\Fridge;
 use App\Entity\Ingredient;
 use App\Entity\User;
+use App\Repository\ContainsIngredientRepository;
 use App\Repository\FridgeRepository;
+use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,5 +104,66 @@ class FridgeController extends AbstractController
  
         return $this->json($EditedFridge, 200, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
  
+    }
+
+    /**
+    * @Route("/suggestion", name="generate", methods={"POST"})
+    */
+    public function generate(RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
+    {
+        /** @var User */
+        $user = $this->getUser();
+
+        // On récupère tout ce qu'il y a dans le frigo
+        $inFridge = $user->getFridges();
+
+        $recipes = $recipeRepository->findAll();
+
+        $ko0 = [];
+        $moins25 = [];
+        $moins50 = [];
+        $moins75 = [];
+        $plus75 = [];
+        $ok100 = [];
+
+        foreach ($recipes as $recipe) {
+            $containsIngredient = $recipe->getContainsIngredients();
+
+            $count = 0;
+            foreach ($containsIngredient as $containsIngredientElement) {
+
+                foreach ($inFridge as $fridgeElement) {
+                    $ingredient = $fridgeElement->getIngredient();
+
+                    if($containsIngredientElement === $containsIngredientRepository->test($ingredient, $recipe)) {
+                        $count += 1;
+                    }
+
+                }
+
+                $total = $count * 100 / count($inFridge);
+
+            }
+
+            if ($total == 100) {
+                $ok100[] = $recipe;
+            } else if ($total > 75) {
+                $plus75[] = $recipe;
+            } else if ($total > 50) {
+                $moins75[] = $recipe;
+            } else if ($total > 25) {
+                $moins50[] = $recipe;
+            } else if ($total > 0) {
+                $moins25[] = $recipe;
+            } else {
+                $ko0[] = $recipe;
+            }
+
+            
+        }
+
+        dd(["100" => $ok100, "+75" => $plus75, "-75" => $moins75, "-50" => $moins50, "-25" => $moins25, "0" => $ko0]);
+
+        return $this->json(["coucou" => "coucou"]);
     }
 }

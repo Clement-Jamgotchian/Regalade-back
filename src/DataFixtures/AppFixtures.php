@@ -126,20 +126,22 @@ class AppFixtures extends Fixture
             $allRecipes[] = $newRecipe;
         }
 
+        $ecart = 0;
         foreach ($allRecipes as $recipe) {
 
             $randomNb = mt_rand(2, 7);
+
             for ($i=1; $i <= $randomNb; $i++) {
 
                 $newContainsIngredient = new ContainsIngredient();
                 $newContainsIngredient->setQuantity(mt_rand(1, 500));
                 $newContainsIngredient->setRecipe($recipe);
-                $newContainsIngredient->setIngredient($allIngredients[mt_rand(0, count($allIngredients)-1)]);
+                $newContainsIngredient->setIngredient($allIngredients[$i + $ecart]);
 
                 $manager->persist($newContainsIngredient);
 
             }
-
+            $ecart += mt_rand(1,4);
         }
 
         /** @var User[] */
