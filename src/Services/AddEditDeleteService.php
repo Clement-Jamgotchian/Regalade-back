@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\Comment;
 use App\Entity\Ingredient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -16,19 +17,26 @@ class AddEditDeleteService
     private $serializerInterface;
     private $entityManagerInterface;
     private $user;
+    private $updateRatingService;
 
-    public function __construct(RequestStack $request, SerializerInterface $serializerInterface, EntityManagerInterface $entityManagerInterface, Security $security)
+    public function __construct(RequestStack $request, SerializerInterface $serializerInterface, EntityManagerInterface $entityManagerInterface, Security $security, UpdateRatingService
+     $updateRatingService)
     {
         $this->request = $request->getCurrentRequest();
         $this->serializerInterface = $serializerInterface;
         $this->entityManagerInterface = $entityManagerInterface;
         $this->user = $security->getUser();
+        $this->updateRatingService = $updateRatingService;
     }
 
     public function add($repository, $entityClass, $newUser = null)
     {
 
         $newAdd = $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json');
+
+        if ($entityClass === Comment::class) {
+            $this->updateRatingService->update($repository, $newAdd->getRecipe(), $newAdd->getRating());
+        }
 
         if($newUser) {
             $newAdd->setUser($newUser);
