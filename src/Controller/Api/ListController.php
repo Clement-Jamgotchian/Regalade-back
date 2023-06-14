@@ -6,9 +6,7 @@ use App\Entity\Recipe;
 use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\RecipeListRepository;
-use App\Repository\UserRepository;
 use App\Services\AddEditDeleteService;
-use App\Services\UserService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,11 +25,11 @@ class ListController extends AbstractController
      *
      * @Route("", name="browse", methods = {"GET"})
      */
-    public function browse(UserService $userService, Request $request, PaginatorInterface $paginatorInterface):JsonResponse
+    public function browse(Request $request, PaginatorInterface $paginatorInterface):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
         
         $recipesList = $user->getRecipeLists();
 
@@ -54,11 +52,11 @@ class ListController extends AbstractController
      *
      * @Route("/{id}", name="add", requirements={"id"="\d+"}, methods = {"POST"})
      */
-    public function add(?Recipe $recipe, UserRepository $userRepository, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
+    public function add(?Recipe $recipe, RecipeListRepository $recipeListRepository):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
         $addRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
 
         if ($recipe === null) {
@@ -85,11 +83,11 @@ class ListController extends AbstractController
      *
      * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      */
-    public function delete(?Recipe $recipe, UserRepository $userRepository, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
+    public function delete(?Recipe $recipe, RecipeListRepository $recipeListRepository):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $rmRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
       
@@ -125,11 +123,11 @@ class ListController extends AbstractController
      *
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      */
-    public function edit(?Recipe $recipe,AddEditDeleteService $addEditDeleteService, UserService $userService, RecipeListRepository $recipeListRepository):JsonResponse
+    public function edit(?Recipe $recipe,AddEditDeleteService $addEditDeleteService, RecipeListRepository $recipeListRepository):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $editRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
 

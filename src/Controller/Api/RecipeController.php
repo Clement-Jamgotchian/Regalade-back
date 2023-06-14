@@ -6,7 +6,6 @@ use App\Entity\Recipe;
 use App\Repository\ContainsIngredientRepository;
 use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
-use App\Services\UserService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,10 +69,10 @@ class RecipeController extends AbstractController
     /**
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      */
-    public function edit(?Recipe $recipe, UserService $userService, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository): JsonResponse
+    public function edit(?Recipe $recipe, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
@@ -110,10 +109,10 @@ class RecipeController extends AbstractController
     /**
      * @Route("/my", name="browseMy", methods={"GET"})
      */
-    public function browseMy(UserService $userService, Request $request, PaginatorInterface $paginatorInterface): JsonResponse
+    public function browseMy(Request $request, PaginatorInterface $paginatorInterface): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $recipesWithPagination = $paginatorInterface->paginate(
             $user->getRecipes(),

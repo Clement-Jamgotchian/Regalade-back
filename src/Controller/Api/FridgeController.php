@@ -6,17 +6,11 @@ use App\Entity\Fridge;
 use App\Entity\Ingredient;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
-use App\Repository\IngredientRepository;
-use App\Repository\UserRepository;
-use App\Services\UserService;
 use App\Services\AddEditDeleteService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
      * @Route("/api/fridge", name="app_api_fridge_")
@@ -27,10 +21,10 @@ class FridgeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(UserService $userService): JsonResponse
+    public function browse(): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $fridge = $user->getFridges();
 
@@ -40,10 +34,10 @@ class FridgeController extends AbstractController
     /**
      * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
      */
-    public function read(?ingredient $ingredient, UserService $userService, FridgeRepository $fridgeRepository):JsonResponse
+    public function read(?ingredient $ingredient, FridgeRepository $fridgeRepository):JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $ingredientToRead = $fridgeRepository->findOneByIngredient($ingredient, $user);
 

@@ -6,7 +6,6 @@ use App\Entity\Member;
 use App\Entity\User;
 use App\Repository\MemberRepository;
 use App\Services\AddEditDeleteService;
-use App\Services\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,10 +28,10 @@ class MemberController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(UserService $userService): JsonResponse
+    public function browse(): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $members = $user->getMembers();
 
