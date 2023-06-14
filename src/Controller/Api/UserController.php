@@ -4,7 +4,6 @@ namespace App\Controller\Api;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Services\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,9 +38,9 @@ class UserController extends AbstractController
     /**
      * @Route("", name="read", methods={"GET"})
      */
-    public function read(UserService $userService): JsonResponse
+    public function read(): JsonResponse
     {
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         return $this->json($user, Response::HTTP_OK, [], ["groups" => ["user_browse"]]);
     }

@@ -7,9 +7,7 @@ use App\Entity\Ingredient;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
-use App\Repository\IngredientRepository;
 use App\Services\AddEditDeleteService;
-use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,10 +22,10 @@ class CartController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(UserService $userService): JsonResponse
+    public function browse(): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $cart = $user->getCarts();
 
@@ -37,10 +35,10 @@ class CartController extends AbstractController
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(UserService $userService, CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository): JsonResponse
+    public function add(CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         // Before add, purge old list
         $cart = $user->getCarts();
@@ -114,10 +112,10 @@ class CartController extends AbstractController
      * @Route("/{id}", name="deleteOne", requirements={"id"="\d+"}, methods={"DELETE"})
      * 
      */
-    public function deleteOne(?Ingredient $ingredient, UserService $userService, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    public function deleteOne(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $cart = $cartRepository->findOneByIngredient($ingredient, $user);
 
@@ -131,10 +129,10 @@ class CartController extends AbstractController
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      * 
      */
-    public function edit(?Ingredient $ingredient, UserService $userService, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $cart = $cartRepository->findOneByIngredient($ingredient, $user);
 
@@ -148,10 +146,10 @@ class CartController extends AbstractController
      * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
      * 
      */
-    public function read(?Ingredient $ingredient, UserService $userService, CartRepository $cartRepository): JsonResponse
+    public function read(?Ingredient $ingredient, CartRepository $cartRepository): JsonResponse
     {
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $cart = $cartRepository->findOneByIngredient($ingredient, $user);
 

@@ -6,6 +6,7 @@ use App\Entity\Ingredient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -13,21 +14,19 @@ class AddEditDeleteService
 {
     private $request;
     private $serializerInterface;
-    private $userService;
     private $entityManagerInterface;
+    private $user;
 
-    public function __construct(RequestStack $request, SerializerInterface $serializerInterface, UserService $userService, EntityManagerInterface $entityManagerInterface)
+    public function __construct(RequestStack $request, SerializerInterface $serializerInterface, EntityManagerInterface $entityManagerInterface, Security $security)
     {
         $this->request = $request->getCurrentRequest();
         $this->serializerInterface = $serializerInterface;
-        $this->userService = $userService;
         $this->entityManagerInterface = $entityManagerInterface;
+        $this->user = $security->getUser();
     }
 
     public function add($repository, $entityClass, $newUser = null)
     {
-        /** @var User */
-        $user = $this->userService->getCurrentUser();
 
         $newAdd = $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json');
 
@@ -35,7 +34,7 @@ class AddEditDeleteService
             $newAdd->setUser($newUser);
         } else {
             if ($entityClass !== Ingredient::class) {
-                $newAdd->setUser($user);
+                $newAdd->setUser($this->user);
             }
         }
 
@@ -50,8 +49,6 @@ class AddEditDeleteService
 
     public function delete($entity, $repository, $entityClass)
     {
-        /** @var User */
-        $user = $this->userService->getCurrentUser();
 
         if ($entity === null) {
             return ["Not found", Response::HTTP_NOT_FOUND];
@@ -59,7 +56,7 @@ class AddEditDeleteService
 
         $getName ="get".substr($entityClass, 11)."s";
 
-        if (!$user->$getName()->contains($entity)) {
+        if (!$this->user->$getName()->contains($entity)) {
             return ["Not for this user", Response::HTTP_BAD_REQUEST];
         }
 
@@ -80,11 +77,9 @@ class AddEditDeleteService
 
     public function deleteAll($entityClass, $repository)
     {
-        /** @var User */
-        $user = $this->userService->getCurrentUser();
 
         $getName ="get".substr($entityClass, 11)."s";
-        $collection = $user->$getName();
+        $collection = $this->user->$getName();
 
         foreach ($collection as $element) {
             $repository->remove($element);

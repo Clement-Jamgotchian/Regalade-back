@@ -5,7 +5,6 @@ namespace App\Controller\Api;
 use App\Entity\Recipe;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Services\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,11 +24,11 @@ class FavoriteController extends AbstractController
      *
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(UserService $userService, Request $request, PaginatorInterface $paginatorInterface):JsonResponse
+    public function browse(Request $request, PaginatorInterface $paginatorInterface):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
         
         $recipes = $user->getFavoriteRecipes();
 
@@ -52,11 +51,11 @@ class FavoriteController extends AbstractController
      *
      * @Route("/{id}", name="add", requirements={"id"="\d+"}, methods = {"POST"})
      */
-    public function add(?Recipe $recipe, UserRepository $userRepository, UserService $userService):JsonResponse
+    public function add(?Recipe $recipe, UserRepository $userRepository):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
@@ -79,11 +78,11 @@ class FavoriteController extends AbstractController
      *
      * @Route("/{id}", name="delete", requirements={"id"="\d+"}, methods={"DELETE"})
      */
-    public function delete(?Recipe $recipe, UserRepository $userRepository, UserService $userService):JsonResponse
+    public function delete(?Recipe $recipe, UserRepository $userRepository):JsonResponse
     {
 
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
@@ -105,11 +104,11 @@ class FavoriteController extends AbstractController
      *
      * @Route("", name="deleteAll", methods={"DELETE"})
      */
-    public function deleteAll(UserService $userService, UserRepository $userRepository, EntityManagerInterface $entityManagerInterface)
+    public function deleteAll(EntityManagerInterface $entityManagerInterface)
     {
         
         /** @var User */
-        $user = $userService->getCurrentUser();
+        $user = $this->getUser();
 
         $recipes = $user->getFavoriteRecipes();
 

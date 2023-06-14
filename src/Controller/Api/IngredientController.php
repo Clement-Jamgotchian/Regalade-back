@@ -5,7 +5,6 @@ namespace App\Controller\Api;
 use App\Entity\Ingredient;
 use App\Repository\IngredientRepository;
 use App\Services\AddEditDeleteService;
-use IntlChar;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
