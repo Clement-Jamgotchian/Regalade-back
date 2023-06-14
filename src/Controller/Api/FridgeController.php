@@ -162,8 +162,15 @@ class FridgeController extends AbstractController
             
         }
 
-        dd(["100" => $ok100, "+75" => $plus75, "-75" => $moins75, "-50" => $moins50, "-25" => $moins25, "0" => $ko0]);
+        $recipes = [];
+        $recipes['100%'] = $ok100;
+        $recipes['75-99%'] = $plus75;
+        $recipes['51-75%'] = $moins75;
+        $recipes['26-50%'] = $moins50;
+        $recipes['1-25%'] = $moins25;
 
-        return $this->json(["coucou" => "coucou"]);
+        // dd(["100" => $ok100, "+75" => $plus75, "-75" => $moins75, "-50" => $moins50, "-25" => $moins25, "0" => $ko0]);
+
+        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
     }
 }
