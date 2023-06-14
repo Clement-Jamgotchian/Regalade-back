@@ -76,21 +76,31 @@ class FridgeController extends AbstractController
     /**
      * @Route("/{id}", name="deleteOne",requirements={"id"="\d+"}, methods={"DELETE"})
      */
-    public function deleteOne(?Fridge $fridge, FridgeRepository $fridgeRepository, AddEditDeleteService $addEditDeleteService): JsonResponse
+    public function deleteOne(?Ingredient $ingredient, FridgeRepository $fridgeRepository, AddEditDeleteService $addEditDeleteService): JsonResponse
     {
-        $fridge = $addEditDeleteService->delete($fridge, $fridgeRepository, Fridge::class);
+        /** @var User */
+        $user = $this->getUser();
+
+        $fridge = $fridgeRepository->findOneByIngredient($ingredient, $user);
+
+        $addEditDeleteService->delete($fridge, $fridgeRepository, Fridge::class);
 
         return $this->json(["message" => "l'ingrédient a été supprimé du frigo"], Response::HTTP_OK);
     }
-
+    
     /**
-     * @Route("/{id}", name="edit",requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
-     */
-    public function edit(?Fridge $fridge, FridgeRepository $fridgeRepository, AddEditDeleteService $addEditDeleteService): JsonResponse
+    * @Route("/{id}", name="edit",requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
+    */
+    public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, FridgeRepository $fridgeRepository): JsonResponse
     {
-        $fridge = $addEditDeleteService->edit($fridge, $fridgeRepository, Fridge::class);
-
-        return $this->json($fridge, 200, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
-
+        /** @var User */
+        $user = $this->getUser();
+ 
+        $fridge = $fridgeRepository->findOneByIngredient($ingredient, $user);
+ 
+        $EditedFridge = $addEditDeleteService->edit($fridge, $fridgeRepository, Fridge::class);
+ 
+        return $this->json($EditedFridge, 200, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
+ 
     }
 }
