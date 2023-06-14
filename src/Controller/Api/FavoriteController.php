@@ -30,7 +30,8 @@ class FavoriteController extends AbstractController
         /** @var User */
         $user = $this->getUser();
         
-        $recipes = $user->getFavoriteRecipes();
+        $recipesCollection = $user->getFavoriteRecipes();
+        $recipes = $recipesCollection->getValues();
 
         $recipesWithPagination = $paginatorInterface->paginate(
             $recipes,
