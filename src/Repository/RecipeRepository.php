@@ -45,7 +45,6 @@ class RecipeRepository extends ServiceEntityRepository
            ->andWhere('r.title LIKE :title')
            ->setParameter('title', '%'. $title .'%')
            ->orderBy('r.rating', 'DESC')
-           ->setMaxResults(10)
            ->getQuery()
            ->getResult()
        ;

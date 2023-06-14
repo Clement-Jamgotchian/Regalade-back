@@ -114,8 +114,11 @@ class RecipeController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
+        $recipesCollection = $user->getRecipes();
+        $recipes = $recipesCollection->getValues();
+
         $recipesWithPagination = $paginatorInterface->paginate(
-            $user->getRecipes(),
+            $recipes,
             $request->query->getInt('page', 1),
             12
         );

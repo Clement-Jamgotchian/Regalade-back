@@ -31,7 +31,8 @@ class ListController extends AbstractController
         /** @var User */
         $user = $this->getUser();
         
-        $recipesList = $user->getRecipeLists();
+        $recipesListCollection = $user->getRecipeLists();
+        $recipesList = $recipesListCollection->getValues();
 
         $recipesWithPagination = $paginatorInterface->paginate(
             $recipesList,
