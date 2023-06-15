@@ -18,6 +18,7 @@ class Ingredient
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_read"})
      * @Groups({"ingredient_browse"})
      */
     private $id;

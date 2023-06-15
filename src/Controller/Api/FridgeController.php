@@ -9,6 +9,7 @@ use App\Repository\ContainsIngredientRepository;
 use App\Repository\FridgeRepository;
 use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
+use App\Services\CompareQuantityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -109,7 +110,7 @@ class FridgeController extends AbstractController
     /**
     * @Route("/suggestion", name="generate", methods={"POST"})
     */
-    public function generate(RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
+    public function generate(RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository, CompareQuantityService $compareQuantityService): JsonResponse
     {
         /** @var User */
         $user = $this->getUser();
@@ -123,42 +124,58 @@ class FridgeController extends AbstractController
         $ko0 = [];
 
         foreach ($recipes as $recipe) {
+            $toSend = [];
+            $toSend['recipe'] = $recipe;
+            $toSend['ingredient'] = [];
+            $toSend['ingredientToBuy'] = [];
             $containsIngredient = $recipe->getContainsIngredients();
 
             $count = 0;
             foreach ($containsIngredient as $containsIngredientElement) {
-
+                $present = false;
                 foreach ($inFridge as $fridgeElement) {
                     $ingredient = $fridgeElement->getIngredient();
 
                     if($containsIngredientElement === $containsIngredientRepository->test($ingredient, $recipe)) {
                         $count += 1;
-                    }
-
+                        $present = true;
+                        
+                        $toSend['ingredient'][] = $compareQuantityService->compareFridge($recipe, $user, $containsIngredientElement);
+                        break;
+                    } 
                 }
 
-                $total = $count * 100 / count($inFridge);
+                if (!$present) {
+                    $ingredient = [];
+                    $ingredient['quantity'] = $containsIngredientElement->getQuantity();
+                    $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
+                    
+                    $toSend['ingredientToBuy'][] = $ingredient;
+                }
 
+                
             }
 
+            $total = $count * 100 / count($containsIngredient);
+
             if ($total == 100) {
-                $propsrecipes['100%'] = $recipe;
+                $propsrecipes['100%'] = $toSend;
             } else if ($total > 75) {
-                $propsrecipes['75-99%'] = $recipe;
+                $propsrecipes['75-99%'] = $toSend;
             } else if ($total > 50) {
-                $propsrecipes['51-75%'] = $recipe;
+                $propsrecipes['51-75%'] = $toSend;
             } else if ($total > 25) {
-                $propsrecipes['26-50%'] = $recipe;
+                $propsrecipes['26-50%'] = $toSend;
             } else if ($total > 0) {
-                $propsrecipes['1-25%'] = $recipe;
+                $propsrecipes['1-25%'] = $toSend;
             } else {
-                $ko0[] = $recipe;
+                $ko0[] = $toSend;
             }
             
         }
 
         // dd(["100" => $ok100, "+75" => $plus75, "-75" => $moins75, "-50" => $moins50, "-25" => $moins25, "0" => $ko0]);
 
-        return $this->json($propsrecipes, 200, [], ['groups' => ["recipe_browse"]]);
+        return $this->json($propsrecipes, 200, [], ['groups' => ["recipe_browse", "ingredient_read"]]);
     }
 }

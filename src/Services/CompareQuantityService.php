@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\Cart;
+use App\Entity\ContainsIngredient;
+use App\Entity\Fridge;
+use App\Entity\Recipe;
 use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
@@ -57,5 +60,31 @@ class CompareQuantityService
 
         $this->entityManagerInterface->flush();
         return $allCart;
+    }
+
+    public function compareFridge(Recipe $recipe, User $user, ContainsIngredient $containsIngredientElement)
+    {
+            $recipePortions = $recipe->getPortions();
+            $portionsWanted = count($user->getMembers());
+
+            $proportion = $portionsWanted / $recipePortions;
+
+                $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
+
+                // dd($ingredientInFridge);
+
+                    $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
+
+                    $ingredient = [];
+                if ($quantityToSet > 0) {
+
+                    $ingredient['quantity'] = round($quantityToSet);
+                    $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
+
+                    // dd($ingredient);
+                
+            }
+
+        return $ingredient;
     }
 }
