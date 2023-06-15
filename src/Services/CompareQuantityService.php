@@ -9,18 +9,25 @@ use App\Entity\Recipe;
 use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
+use App\Repository\RecipeListRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Security;
 
 class CompareQuantityService
 {
     private $entityManagerInterface;
     private $fridgeRepository;
+    private $recipeListRepository;
+    /** @var User */
+    private $user;
 
-    public function __construct(EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository)
+    public function __construct(EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository, RecipeListRepository $recipeListRepository, Security $security)
     {
         $this->entityManagerInterface = $entityManagerInterface;
         $this->fridgeRepository = $fridgeRepository;
+        $this->recipeListRepository = $recipeListRepository;
+        $this->user = $security->getUser();
     }
 
     public function compare(Collection $recipesList, User $user)
@@ -62,22 +69,57 @@ class CompareQuantityService
         return $allCart;
     }
 
-    public function compareFridge(Recipe $recipe, User $user, ContainsIngredient $containsIngredientElement)
+    public function compareFridge(Recipe $recipe, User $user, ContainsIngredient $containsIngredientElement2)
     {
+        $recipesList = $this->user->getRecipeLists();
+
+        $substract = 0;
+
+        foreach ($recipesList as $recipesListElement) {
+            $containsIngredient = $recipesListElement->getRecipe()->getContainsIngredients();
+
+            $recipePortions = $recipesListElement->getRecipe()->getPortions();
+            $portionsWanted = $recipesListElement->getPortions();
+
+            $proportion = $portionsWanted / $recipePortions;
+
+            foreach ($containsIngredient as $containsIngredientElement) {
+
+                $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
+
+                if ($ingredientInFridge) {
+                    $quantityToSubstract = ($containsIngredientElement->getQuantity() * $proportion);
+                    $substract += $quantityToSubstract;
+                } 
+            }
+        }
+
         $recipePortions = $recipe->getPortions();
         $portionsWanted = count($user->getMembers());
 
         $proportion = $portionsWanted / $recipePortions;
 
-        $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
+        $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement2->getIngredient(), $user);
 
+        if (is_null($ingredientInFridge)) {
+            return null;
+        }
 
-        $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
+        $quantityToSet = ($containsIngredientElement2->getQuantity() * $proportion) - ( $ingredientInFridge->getQuantity() - $substract );
 
         $ingredient = [];
 
-        $ingredient['quantity'] = round($quantityToSet);
-        $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
+        if ($quantityToSet < 0) {
+            $ingredient['quantity'] = round(($containsIngredientElement2->getQuantity() * $proportion));
+            $ingredient['status'] = true;
+
+        } else {
+            $ingredient['quantity'] = round($quantityToSet);
+            $ingredient['status'] =  false;
+        }
+
+        
+        $ingredient['ingredient'] = $containsIngredientElement2->getIngredient();
 
 
         return $ingredient;

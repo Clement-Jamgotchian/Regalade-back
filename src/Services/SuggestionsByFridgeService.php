@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\User;
 use App\Repository\ContainsIngredientRepository;
+use App\Repository\RecipeListRepository;
 use App\Repository\RecipeRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
@@ -15,13 +16,15 @@ class SuggestionsByFridgeService
     private $recipeRepository;
     private $containsIngredientRepository;
     private $compareQuantityService;
+    private $recipeListRepository;
 
-    public function __construct(Security $security, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository, CompareQuantityService $compareQuantityService)
+    public function __construct(Security $security, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository, CompareQuantityService $compareQuantityService, RecipeListRepository $recipeListRepository)
     {
         $this->user = $security->getUser();
         $this->recipeRepository = $recipeRepository;
         $this->containsIngredientRepository = $containsIngredientRepository;
         $this->compareQuantityService = $compareQuantityService;
+        $this->recipeListRepository = $recipeListRepository;
     }
 
     public function suggest()
@@ -44,6 +47,10 @@ class SuggestionsByFridgeService
         $ko0 = [];
 
         foreach ($recipes as $recipe) {
+
+            if ($this->recipeListRepository->findOneByRecipe($recipe, $this->user)) {
+                continue;
+            }
             $toSend = [];
             $toSend['recipe'] = $recipe;
             $toSend['ingredientsOk'] = [];
@@ -60,17 +67,22 @@ class SuggestionsByFridgeService
                     $usefulIngredient = $containsIngredientElement === $this->containsIngredientRepository->test($ingredient, $recipe);
 
                     if($usefulIngredient) {
-                        $count += 1;
+                        
                         
                         $comparison = $this->compareQuantityService->compareFridge($recipe, $this->user, $containsIngredientElement);
 
-                        if ($comparison['quantity'] < 0) {
+                        if (is_null($comparison)) {
                             $ingredient = [];
-                            $ingredient['quantity'] = $fridgeElement->getQuantity();
+                            $ingredient['quantity'] = $containsIngredientElement->getQuantity();
                             $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
-                            $toSend['ingredientsOk'][] = $ingredient;
+                            
+                            $toSend['ingredientsToBuy'][] = $ingredient;
+                        } else if ($comparison['status']) {
+                            $toSend['ingredientsOk'][] = $this->compareQuantityService->compareFridge($recipe, $this->user, $containsIngredientElement);
+                            $count += 1;
                         } else {
                             $toSend['ingredientsToComplete'][] = $this->compareQuantityService->compareFridge($recipe, $this->user, $containsIngredientElement);
+                            $count += 1;
                         }
                         
                         break;
