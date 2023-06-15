@@ -119,12 +119,8 @@ class FridgeController extends AbstractController
 
         $recipes = $recipeRepository->findAll();
 
+        $propsrecipes = [];
         $ko0 = [];
-        $moins25 = [];
-        $moins50 = [];
-        $moins75 = [];
-        $plus75 = [];
-        $ok100 = [];
 
         foreach ($recipes as $recipe) {
             $containsIngredient = $recipe->getContainsIngredients();
@@ -146,31 +142,23 @@ class FridgeController extends AbstractController
             }
 
             if ($total == 100) {
-                $ok100[] = $recipe;
+                $propsrecipes['100%'] = $recipe;
             } else if ($total > 75) {
-                $plus75[] = $recipe;
+                $propsrecipes['75-99%'] = $recipe;
             } else if ($total > 50) {
-                $moins75[] = $recipe;
+                $propsrecipes['51-75%'] = $recipe;
             } else if ($total > 25) {
-                $moins50[] = $recipe;
+                $propsrecipes['26-50%'] = $recipe;
             } else if ($total > 0) {
-                $moins25[] = $recipe;
+                $propsrecipes['1-25%'] = $recipe;
             } else {
                 $ko0[] = $recipe;
             }
-
             
         }
 
-        $recipes = [];
-        $recipes['100%'] = $ok100;
-        $recipes['75-99%'] = $plus75;
-        $recipes['51-75%'] = $moins75;
-        $recipes['26-50%'] = $moins50;
-        $recipes['1-25%'] = $moins25;
-
         // dd(["100" => $ok100, "+75" => $plus75, "-75" => $moins75, "-50" => $moins50, "-25" => $moins25, "0" => $ko0]);
 
-        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
+        return $this->json($propsrecipes, 200, [], ['groups' => ["recipe_browse"]]);
     }
 }

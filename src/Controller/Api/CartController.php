@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
 use App\Services\AddEditDeleteService;
+use App\Services\CompareQuantityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,7 +36,7 @@ class CartController extends AbstractController
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(CartRepository $cartRepository, EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository): JsonResponse
+    public function add(CartRepository $cartRepository, CompareQuantityService $compareQuantityService): JsonResponse
     {
         /** @var User */
         $user = $this->getUser();
@@ -48,40 +49,7 @@ class CartController extends AbstractController
 
         $recipesList = $user->getRecipeLists();
 
-        $allCart = [];
-        foreach ($recipesList as $recipesListElement) {
-            $containsIngredient = $recipesListElement->getRecipe()->getContainsIngredients();
-
-            $recipePortions = $recipesListElement->getRecipe()->getPortions();
-            $portionsWanted = $recipesListElement->getPortions();
-
-            $proportion = $portionsWanted / $recipePortions;
-
-            foreach ($containsIngredient as $containsIngredientElement) {
-
-                $ingredientInFridge = $fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
-
-                if (!is_null($ingredientInFridge)) {
-                    $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
-                } else {
-                    $quantityToSet = $containsIngredientElement->getQuantity() * $proportion;
-                }
-
-                if ($quantityToSet > 0) {
-                    $newCart = new Cart();
-                    $newCart->setIngredient($containsIngredientElement->getIngredient());
-                    $newCart->setUser($user);
-                    $newCart->setQuantity(round($quantityToSet));
-
-                    $allCart[] = $newCart;
-
-                    $entityManagerInterface->persist($newCart);
-                }
-                
-            }
-        }
-
-        $entityManagerInterface->flush();
+        $allCart = $compareQuantityService->compare($recipesList, $user);
 
         return $this->json($allCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
     }
