@@ -19,6 +19,7 @@ class Ingredient
      * @ORM\Column(type="integer")
      * @Groups({"recipe_read"})
      * @Groups({"ingredient_browse"})
+     * @Groups({"ingredient_read"})
      */
     private $id;
 
