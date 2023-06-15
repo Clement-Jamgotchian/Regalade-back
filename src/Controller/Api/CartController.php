@@ -47,9 +47,7 @@ class CartController extends AbstractController
             $cartRepository->remove($cartElement);
         }
 
-        $recipesList = $user->getRecipeLists();
-
-        $allCart = $compareQuantityService->compare($recipesList, $user);
+        $allCart = $compareQuantityService->compareQuantityToAddInCart();
 
         return $this->json($allCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
     }

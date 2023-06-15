@@ -50,7 +50,7 @@ class ContainsIngredientRepository extends ServiceEntityRepository
    }
 
 
-   public function test($ingredient, $recipe): ?ContainsIngredient
+   public function ingredientIsInRecipe($ingredient, $recipe): ?ContainsIngredient
    {
        $em = $this->getEntityManager();
 

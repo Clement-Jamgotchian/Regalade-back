@@ -5,11 +5,8 @@ namespace App\Controller\Api;
 use App\Entity\Fridge;
 use App\Entity\Ingredient;
 use App\Entity\User;
-use App\Repository\ContainsIngredientRepository;
 use App\Repository\FridgeRepository;
-use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
-use App\Services\CompareQuantityService;
 use App\Services\SuggestionsByFridgeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -109,13 +106,12 @@ class FridgeController extends AbstractController
     }
 
     /**
-    * @Route("/suggestion", name="generate", methods={"POST"})
+    * @Route("/suggestion", name="suggestion", methods={"POST"})
     */
-    public function generate(SuggestionsByFridgeService $suggestionsByFridgeService): JsonResponse
+    public function suggestion(SuggestionsByFridgeService $suggestionsByFridgeService): JsonResponse
     {
+        $suggestions = $suggestionsByFridgeService->makeSuggestions();
 
-        $suggest = $suggestionsByFridgeService->suggest();
-
-        return $this->json($suggest['content'], $suggest['code'], [], ['groups' => ["recipe_browse", "ingredient_read"]]);
+        return $this->json($suggestions['content'], $suggestions['code'], [], ['groups' => ["recipe_browse", "ingredient_read"]]);
     }
 }

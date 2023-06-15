@@ -27,62 +27,51 @@ class SuggestionsByFridgeService
         $this->recipeListRepository = $recipeListRepository;
     }
 
-    public function suggest()
+    public function makeSuggestions()
     {
 
-        $inFridge = $this->user->getFridges();
+        $fridge = $this->user->getFridges();
 
-        $return = [];
-
-        if ($inFridge->isEmpty()) {
-            $return['content'] = '';
-            $return['code'] = Response::HTTP_NO_CONTENT;
-            return $return;
+        if ($fridge->isEmpty()) {
+            return ['content' => '', 'code' => Response::HTTP_NO_CONTENT];
         }
 
+        $suggestionsArray = ['100%' => [], '76-99%' => [], '51-75%' => [], '26-50%' => [], '1-25%' => []];
+
         $recipes = $this->recipeRepository->findAll();
-
-        $propsrecipes = [];
-        
-        $ko0 = [];
-
         foreach ($recipes as $recipe) {
 
             if ($this->recipeListRepository->findOneByRecipe($recipe, $this->user)) {
                 continue;
             }
-            $toSend = [];
-            $toSend['recipe'] = $recipe;
-            $toSend['ingredientsOk'] = [];
-            $toSend['ingredientsToComplete'] = [];
-            $toSend['ingredientsToBuy'] = [];
-            $containsIngredient = $recipe->getContainsIngredients();
 
+            $proposition = ['recipe' => $recipe, 'ingredientsOk' => [], 'ingredientsToComplete' => [], 'ingredientsToBuy' => []];
+
+            $containsIngredient = $recipe->getContainsIngredients();
             $count = 0;
             foreach ($containsIngredient as $containsIngredientElement) {
 
-                foreach ($inFridge as $fridgeElement) {
+                foreach ($fridge as $fridgeElement) {
                     $ingredient = $fridgeElement->getIngredient();
 
-                    $usefulIngredient = $containsIngredientElement === $this->containsIngredientRepository->test($ingredient, $recipe);
+                    $usefulIngredient = $containsIngredientElement === $this->containsIngredientRepository->ingredientIsInRecipe($ingredient, $recipe);
 
                     if($usefulIngredient) {
                         
-                        
-                        $comparison = $this->compareQuantityService->compareFridge($recipe, $this->user, $containsIngredientElement);
+                        $comparison = $this->compareQuantityService->compareQuantityToMakeSuggestion($recipe, $containsIngredientElement);
 
                         if (is_null($comparison)) {
                             $ingredient = [];
                             $ingredient['quantity'] = $containsIngredientElement->getQuantity();
                             $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
                             
-                            $toSend['ingredientsToBuy'][] = $ingredient;
+                            $proposition['ingredientsToBuy'][] = $ingredient;
                         } else if ($comparison['status']) {
-                            $toSend['ingredientsOk'][] = $this->compareQuantityService->compareFridge($recipe, $this->user, $containsIngredientElement);
+                            $proposition['ingredientsOk'][] = $comparison;
                             $count += 1;
                         } else {
-                            $toSend['ingredientsToComplete'][] = $this->compareQuantityService->compareFridge($recipe, $this->user, $containsIngredientElement);
-                            $count += 1;
+                            $proposition['ingredientsToComplete'][] = $comparison;
+                            $count += 0.5;
                         }
                         
                         break;
@@ -94,39 +83,28 @@ class SuggestionsByFridgeService
                     $ingredient['quantity'] = $containsIngredientElement->getQuantity();
                     $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
                     
-                    $toSend['ingredientsToBuy'][] = $ingredient;
+                    $proposition['ingredientsToBuy'][] = $ingredient;
                 }
 
-                
             }
 
-            $total = $count * 100 / count($containsIngredient);
+            $proportionOfIngredientsInFridge = $count * 100 / count($containsIngredient);
 
-            if ($total == 100) {
-                $propsrecipes['100%'][] = $toSend;
-            } else if ($total > 75) {
-                $propsrecipes['75-99%'][] = $toSend;
-            } else if ($total > 50) {
-                $propsrecipes['51-75%'][] = $toSend;
-            } else if ($total > 25) {
-                $propsrecipes['26-50%'][] = $toSend;
-            } else if ($total > 0) {
-                $propsrecipes['1-25%'][] = $toSend;
-            } else {
-                $ko0[] = $toSend;
+            if ($proportionOfIngredientsInFridge == 100) {
+                $suggestionsArray['100%'][] = $proposition;
+            } else if ($proportionOfIngredientsInFridge > 75) {
+                $suggestionsArray['76-99%'][] = $proposition;
+            } else if ($proportionOfIngredientsInFridge > 50) {
+                $suggestionsArray['51-75%'][] = $proposition;
+            } else if ($proportionOfIngredientsInFridge > 25) {
+                $suggestionsArray['26-50%'][] = $proposition;
+            } else if ($proportionOfIngredientsInFridge > 0) {
+                $suggestionsArray['1-25%'][] = $proposition;
             }
             
         }
 
-        if (empty($propsrecipes)) {
-            $return['content'] = '';
-            $return['code'] = Response::HTTP_NO_CONTENT;
-        } else {
-            $return['content'] = $propsrecipes;
-            $return['code'] = Response::HTTP_CREATED;
-        }
-
-        return $return;
-
+        return (empty($suggestionsArray)) ? ['content' => '', 'code' => Response::HTTP_NO_CONTENT] : ['content' => $suggestionsArray, 'code' => Response::HTTP_CREATED];
+        
     }
 }
