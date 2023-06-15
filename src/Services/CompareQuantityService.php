@@ -64,26 +64,21 @@ class CompareQuantityService
 
     public function compareFridge(Recipe $recipe, User $user, ContainsIngredient $containsIngredientElement)
     {
-            $recipePortions = $recipe->getPortions();
-            $portionsWanted = count($user->getMembers());
+        $recipePortions = $recipe->getPortions();
+        $portionsWanted = count($user->getMembers());
 
-            $proportion = $portionsWanted / $recipePortions;
+        $proportion = $portionsWanted / $recipePortions;
 
-                $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
+        $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $user);
 
-                // dd($ingredientInFridge);
 
-                    $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
+        $quantityToSet = ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity();
 
-                    $ingredient = [];
-                if ($quantityToSet > 0) {
+        $ingredient = [];
 
-                    $ingredient['quantity'] = round($quantityToSet);
-                    $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
+        $ingredient['quantity'] = round($quantityToSet);
+        $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
 
-                    // dd($ingredient);
-                
-            }
 
         return $ingredient;
     }

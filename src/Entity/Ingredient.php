@@ -28,6 +28,7 @@ class Ingredient
      * @Groups({"recipe_read"})
      * @Groups({"ingredient_read"})
      * @Groups({"ingredient_browse"})
+     * @Groups({"ingredient_suggestion"})
      */
     private $name;
 
@@ -42,6 +43,7 @@ class Ingredient
      * @Groups({"recipe_read"})
      * @Groups({"ingredient_read"})
      * @Groups({"ingredient_browse"})
+     * @Groups({"ingredient_suggestion"})
      */
     private $unit;
 
