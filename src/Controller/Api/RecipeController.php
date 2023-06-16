@@ -40,6 +40,10 @@ class RecipeController extends AbstractController
         $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
         $toSend['recipes'] = $recipesWithPagination;
 
+        if(empty($recipes)) {
+            return $this->json('', Response::HTTP_NO_CONTENT, []);
+        }
+
         return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
     }
     

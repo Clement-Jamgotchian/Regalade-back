@@ -7,21 +7,29 @@ use App\Repository\IngredientRepository;
 use App\Services\AddEditDeleteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/api/ingredients", name="app_api_ingredients_")
  */
-
 class IngredientController extends AbstractController
 {
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(ingredientRepository $ingredientRepository): JsonResponse
+    public function browse(Request $request, IngredientRepository $ingredientRepository): JsonResponse
     {
-        $ingredients = $ingredientRepository->findAll();
+        if(!is_null($request->query->get('search'))) {
+            $ingredients = $ingredientRepository->findWhere($request->query->get('search'));
+        } else {
+            $ingredients = $ingredientRepository->findAll();
+        }
+
+        if (empty($ingredients)) {
+            return $this->json('', Response::HTTP_NO_CONTENT, []);
+        }
 
         return $this->json($ingredients, 200, [], ['groups' => ["ingredient_browse"]]);
     }
@@ -52,7 +60,6 @@ class IngredientController extends AbstractController
     /**
     * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
     */
-
     public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
     {
          $addEditDeleteService->edit($ingredient, $ingredientRepository, Ingredient::class);
