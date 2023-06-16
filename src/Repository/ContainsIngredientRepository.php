@@ -49,6 +49,17 @@ class ContainsIngredientRepository extends ServiceEntityRepository
        ;
    }
 
+
+   public function ingredientIsInRecipe($ingredient, $recipe): ?ContainsIngredient
+   {
+       $em = $this->getEntityManager();
+
+       $query = $em->createQuery('SELECT contains FROM App\Entity\ContainsIngredient contains JOIN contains.recipe recipe WHERE contains.ingredient = :ingredient AND contains.recipe = :recipe');
+       $query->setParameter('ingredient', $ingredient);
+       $query->setParameter('recipe', $recipe);
+       return $query->getOneOrNullResult();
+   }
+
 //    /**
 //     * @return ContainsIngredient[] Returns an array of ContainsIngredient objects
 //     */

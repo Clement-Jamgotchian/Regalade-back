@@ -7,6 +7,7 @@ use App\Entity\Ingredient;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
 use App\Services\AddEditDeleteService;
+use App\Services\SuggestionsByFridgeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -102,5 +103,15 @@ class FridgeController extends AbstractController
  
         return $this->json($EditedFridge, 200, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
  
+    }
+
+    /**
+    * @Route("/suggestion", name="suggestion", methods={"POST"})
+    */
+    public function suggestion(SuggestionsByFridgeService $suggestionsByFridgeService): JsonResponse
+    {
+        $suggestions = $suggestionsByFridgeService->makeSuggestions();
+
+        return $this->json($suggestions['content'], $suggestions['code'], [], ['groups' => ["recipe_browse", "ingredient_suggestion"]]);
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\ContainsIngredient;
 use App\Entity\Recipe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -49,6 +51,7 @@ class RecipeRepository extends ServiceEntityRepository
            ->getResult()
        ;
     }
+
 
 
 //    /**
