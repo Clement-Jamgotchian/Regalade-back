@@ -48,6 +48,7 @@ security:
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/user, roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/user, roles: IS_AUTHENTICATED_FULLY, methods: [PUT] }
         - { path: ^/api/recipes/my, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
         - { path: ^/api/recipes, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/ingredients, roles: PUBLIC_ACCESS, methods: [GET] }
