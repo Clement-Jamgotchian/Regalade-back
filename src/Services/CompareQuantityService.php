@@ -7,6 +7,7 @@ use App\Entity\ContainsIngredient;
 use App\Entity\Fridge;
 use App\Entity\Recipe;
 use App\Entity\User;
+use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
@@ -15,21 +16,21 @@ class CompareQuantityService
 {
     private $entityManagerInterface;
     private $fridgeRepository;
+    private $cartRepository;
     /** @var User */
     private $user;
 
-    public function __construct(EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository, Security $security)
+    public function __construct(EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository, Security $security, CartRepository $cartRepository)
     {
         $this->entityManagerInterface = $entityManagerInterface;
         $this->fridgeRepository = $fridgeRepository;
         $this->user = $security->getUser();
+        $this->cartRepository = $cartRepository;
     }
 
     public function compareQuantityToAddInCart()
     {
         $allCart = $this->checkRecipesList(Cart::class, []);
-
-        $this->entityManagerInterface->flush();
 
         return $allCart;
     }
@@ -76,7 +77,9 @@ class CompareQuantityService
 
                 if ($entityClass === Cart::class) {
                     $newCart = $this->addToCart($ingredientInFridge, $containsIngredientElement, $proportion);
-                    $element[] = $newCart;
+                    if (!in_array($newCart, $element)) {
+                        $element[] = $newCart;
+                    }
                 } 
                 
                 if ($entityClass === Fridge::class) {
@@ -97,14 +100,17 @@ class CompareQuantityService
         $quantityToSet = (!is_null($ingredientInFridge)) ? ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity() : $containsIngredientElement->getQuantity() * $proportion;
 
         if ($quantityToSet > 0) {
-            $newCart = new Cart();
-            $newCart->setIngredient($containsIngredientElement->getIngredient())
+
+            $cart = $this->cartRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $this->user) ?? new Cart();
+
+            $cart->setIngredient($containsIngredientElement->getIngredient())
                     ->setUser($this->user)
-                    ->setQuantity(round($quantityToSet));
+                    ->setQuantity(round($quantityToSet + $cart->getQuantity()));
 
-            $this->entityManagerInterface->persist($newCart);
+            $this->cartRepository->add($cart, true);
 
-            return $newCart;
+            return $cart;
+
         }
 
     }
