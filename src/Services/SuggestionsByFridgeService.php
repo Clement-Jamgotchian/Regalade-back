@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\Repository\ContainsIngredientRepository;
 use App\Repository\RecipeListRepository;
 use App\Repository\RecipeRepository;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
@@ -17,14 +19,18 @@ class SuggestionsByFridgeService
     private $containsIngredientRepository;
     private $compareQuantityService;
     private $recipeListRepository;
+    private $paginatorInterface;
+    private $request;
 
-    public function __construct(Security $security, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository, CompareQuantityService $compareQuantityService, RecipeListRepository $recipeListRepository)
+    public function __construct(Security $security, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository, CompareQuantityService $compareQuantityService, RecipeListRepository $recipeListRepository, PaginatorInterface $paginatorInterface, RequestStack $request)
     {
         $this->user = $security->getUser();
         $this->recipeRepository = $recipeRepository;
         $this->containsIngredientRepository = $containsIngredientRepository;
         $this->compareQuantityService = $compareQuantityService;
         $this->recipeListRepository = $recipeListRepository;
+        $this->paginatorInterface = $paginatorInterface;
+        $this->request = $request->getCurrentRequest();
     }
 
     public function makeSuggestions()
@@ -36,20 +42,18 @@ class SuggestionsByFridgeService
             return ['content' => '', 'code' => Response::HTTP_NO_CONTENT];
         }
 
-        $suggestionsArray = ['100%' => [], '76-99%' => [], '51-75%' => [], '26-50%' => [], '1-25%' => []];
+        $suggestionsArray = [];
 
-        $recipes = $this->recipeRepository->findAll();
-        foreach ($recipes as $recipe) {
+        foreach ($this->recipeRepository->findAll() as $recipe) {
 
             if ($this->recipeListRepository->findOneByRecipe($recipe, $this->user)) {
                 continue;
             }
 
-            $proposition = ['recipe' => $recipe, 'ingredientsOk' => [], 'ingredientsToComplete' => [], 'ingredientsToBuy' => []];
+            $proposition = ['percent' => '', 'recipe' => $recipe, 'ingredientsOk' => [], 'ingredientsToComplete' => [], 'ingredientsToBuy' => []];
 
-            $containsIngredient = $recipe->getContainsIngredients();
             $count = 0;
-            foreach ($containsIngredient as $containsIngredientElement) {
+            foreach ($recipe->getContainsIngredients() as $containsIngredientElement) {
 
                 foreach ($fridge as $fridgeElement) {
                     $ingredient = $fridgeElement->getIngredient();
@@ -67,11 +71,11 @@ class SuggestionsByFridgeService
                             
                             $proposition['ingredientsToBuy'][] = $ingredient;
                         } else if ($comparison['status']) {
-                            $proposition['ingredientsOk'][] = $comparison;
+                            $proposition['ingredientsOk'][] = $comparison['ingredient'];
                             $count += 1;
                         } else {
-                            $proposition['ingredientsToComplete'][] = $comparison;
-                            $count += 0.5;
+                            $proposition['ingredientsToComplete'][] = $comparison['ingredient'];
+                            $count += $comparison['percent'];
                         }
                         
                         break;
@@ -80,7 +84,10 @@ class SuggestionsByFridgeService
 
                 if (!$usefulIngredient) {
                     $ingredient = [];
-                    $ingredient['quantity'] = $containsIngredientElement->getQuantity();
+                    $recipePortions = $recipe->getPortions();
+                    $portionsWanted = count($this->user->getMembers());
+                    $proportion = $portionsWanted / $recipePortions;
+                    $ingredient['quantity'] = round($containsIngredientElement->getQuantity() * $proportion);
                     $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
                     
                     $proposition['ingredientsToBuy'][] = $ingredient;
@@ -88,23 +95,29 @@ class SuggestionsByFridgeService
 
             }
 
-            $proportionOfIngredientsInFridge = $count * 100 / count($containsIngredient);
+            $proportionOfIngredientsInFridge = $count * 100 / count($recipe->getContainsIngredients());
 
-            if ($proportionOfIngredientsInFridge == 100) {
-                $suggestionsArray['100%'][] = $proposition;
-            } else if ($proportionOfIngredientsInFridge > 75) {
-                $suggestionsArray['76-99%'][] = $proposition;
-            } else if ($proportionOfIngredientsInFridge > 50) {
-                $suggestionsArray['51-75%'][] = $proposition;
-            } else if ($proportionOfIngredientsInFridge > 25) {
-                $suggestionsArray['26-50%'][] = $proposition;
-            } else if ($proportionOfIngredientsInFridge > 0) {
-                $suggestionsArray['1-25%'][] = $proposition;
+            $proposition['percent'] = round($proportionOfIngredientsInFridge, 2);
+            if ($proportionOfIngredientsInFridge > 0) {
+                $suggestionsArray[] = $proposition;
             }
             
         }
 
-        return (empty($suggestionsArray)) ? ['content' => '', 'code' => Response::HTTP_NO_CONTENT] : ['content' => $suggestionsArray, 'code' => Response::HTTP_CREATED];
+        $sortByPercentageOfIngredientInFridge = array_column($suggestionsArray, 'percent');
+        array_multisort($sortByPercentageOfIngredientInFridge, SORT_DESC, $suggestionsArray);
+
+        $recipesWithPagination = $this->paginatorInterface->paginate(
+            $suggestionsArray,
+            $this->request->query->getInt('page', 1),
+            12
+        );
+
+        $toSend = [];
+        $toSend['totalPages'] = ceil($recipesWithPagination->getTotalItemCount() / $recipesWithPagination->getItemNumberPerPage());
+        $toSend['recipes'] = $recipesWithPagination;
+
+        return (empty($suggestionsArray)) ? ['content' => '', 'code' => Response::HTTP_NO_CONTENT] : ['content' => $toSend, 'code' => Response::HTTP_CREATED];
         
     }
 }

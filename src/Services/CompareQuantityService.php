@@ -51,9 +51,13 @@ class CompareQuantityService
 
         $quantityToSet = ($containsIngredientElement2->getQuantity() * $proportion) - ($ingredientInFridge->getQuantity() - $substract);
 
-        $ingredient = ($quantityToSet < 0) ? ['status' => true, 'quantity' => round(($containsIngredientElement2->getQuantity() * $proportion)), 'ingredient' => $containsIngredientElement2->getIngredient()] : ['status' => false, 'quantity' => round($quantityToSet), 'ingredient' => $containsIngredientElement2->getIngredient() ];
+        $percent = round(($ingredientInFridge->getQuantity() - $substract) / ($containsIngredientElement2->getQuantity() * $proportion), 2);
 
-        return $ingredient;
+        $status = ($quantityToSet < 0) ? true : false;
+
+        $ingredient = ($quantityToSet < 0) ? ['quantity' => round(($containsIngredientElement2->getQuantity() * $proportion)), 'ingredient' => $containsIngredientElement2->getIngredient()] : ['quantity' => round($quantityToSet), 'ingredient' => $containsIngredientElement2->getIngredient() ];
+
+        return ['status' => $status, 'ingredient' => $ingredient, 'percent' => $percent];
     }
 
     public function checkRecipesList($entityClass, $element = null)

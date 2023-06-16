@@ -112,6 +112,6 @@ class FridgeController extends AbstractController
     {
         $suggestions = $suggestionsByFridgeService->makeSuggestions();
 
-        return $this->json($suggestions['content'], $suggestions['code'], [], ['groups' => ["recipe_browse", "ingredient_read"]]);
+        return $this->json($suggestions['content'], $suggestions['code'], [], ['groups' => ["recipe_browse", "ingredient_suggestion"]]);
     }
 }
