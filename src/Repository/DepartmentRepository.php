@@ -39,6 +39,16 @@ class DepartmentRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWhere($name): array
+    {
+       return $this->createQueryBuilder('d')
+           ->andWhere('d.name LIKE :name')
+           ->setParameter('name', '%'. $name .'%')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
 //    /**
 //     * @return Department[] Returns an array of Department objects
 //     */

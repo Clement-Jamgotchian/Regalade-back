@@ -39,6 +39,17 @@ class AllergenRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWhere($name): array
+    {
+       return $this->createQueryBuilder('a')
+           ->andWhere('a.name LIKE :name')
+           ->setParameter('name', '%'. $name .'%')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
+
 //    /**
 //     * @return Allergen[] Returns an array of Allergen objects
 //     */

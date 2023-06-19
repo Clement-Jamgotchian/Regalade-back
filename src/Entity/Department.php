@@ -17,12 +17,14 @@ class Department
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"department_browse"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"ingredient_read"})
+     * @Groups({"department_browse"})
      */
     private $name;
 
