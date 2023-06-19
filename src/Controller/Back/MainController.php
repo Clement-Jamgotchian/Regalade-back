@@ -10,24 +10,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
-* @Route("/admin", name="app_back_main_")
-*/
+
 class MainController extends AbstractController
 {
     /**
-    * @Route("", name="browse", methods{"GET"})
+    * @Route("/admin", name="app_back_main_")
     */
-    public function browse(UserRepository $userRepository,RecipeRepository  $recipeRepository, CommentRepository $commentRepository): JsonResponse
+    public function browse(UserRepository $userRepository,RecipeRepository  $recipeRepository, CommentRepository $commentRepository)
     {
-        /** @var User */
-        $user = $this->getUser();
-
         $comments = $commentRepository->findAll();
         $recipes = $recipeRepository->findAll();
         $users = $userRepository->findAll();
+        dd($comments);
 
-        return $this->render('main/index.html.twig', [
+        return $this->render('back/index.html.twig', [
             'comments' => $comments,
             'recipe' => $recipes,
             'user' => $users,
