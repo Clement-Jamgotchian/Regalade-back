@@ -25,7 +25,6 @@ class UserController extends AbstractController
     public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UploadImageService $uploadImageService, UserPasswordHasherInterface $userPasswordHasherInterface, MemberController $memberController): JsonResponse
     {
 
-        
         /** @var User */
         $newUser = $serializerInterface->deserialize($request->getContent(), User::class, 'json');
 
