@@ -24,6 +24,7 @@ class Allergen
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"allergen_browse"})
+     * @Groups({"recipe_browse"})
      */
     private $name;
 

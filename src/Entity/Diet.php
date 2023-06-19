@@ -24,6 +24,7 @@ class Diet
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"diet_browse"})
+     * @Groups({"recipe_browse"})
      */
     private $name;
 
