@@ -20,9 +20,14 @@ class UploadImageService
             $folder = 'recipe-picture/';
         }
 
-        $file = "images/" . $folder . uniqid() . '.png';
+        $base64 = explode("base64,", $entity->getPicture());
+        $format = trim(str_replace('data:image/', '', $base64[0]), ';');
 
-        file_put_contents($file, base64_decode($entity->getPicture()));
+        $stringToConvert = base64_decode($base64[1]);
+
+        $file = "images/" . $folder . uniqid() . '.' . $format;
+
+        file_put_contents($file, $stringToConvert);
 
         $entity->setPicture($file);
 

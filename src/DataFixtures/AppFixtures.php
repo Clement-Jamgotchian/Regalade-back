@@ -199,115 +199,115 @@ class AppFixtures extends Fixture
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(1);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[6]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(3);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[7]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(20);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[8]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(200);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[9]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(2);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[10]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(30);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[11]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(4);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[1]);
         $newContainsIngredient->setIngredient($allIngredients[12]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(1);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[13]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(3);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[1]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(1);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[14]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(800);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[15]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(70);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[16]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(125);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[17]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(100);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[2]);
         $newContainsIngredient->setIngredient($allIngredients[18]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(200);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[3]);
         $newContainsIngredient->setIngredient($allIngredients[19]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(100);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[3]);
         $newContainsIngredient->setIngredient($allIngredients[20]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(50);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[3]);
         $newContainsIngredient->setIngredient($allIngredients[18]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(100);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[3]);
         $newContainsIngredient->setIngredient($allIngredients[21]);
         $manager->persist($newContainsIngredient);
 
         $newContainsIngredient = new ContainsIngredient();
         $newContainsIngredient->setQuantity(3);
-        $newContainsIngredient->setRecipe($allRecipes[0]);
+        $newContainsIngredient->setRecipe($allRecipes[3]);
         $newContainsIngredient->setIngredient($allIngredients[10]);
         $manager->persist($newContainsIngredient);
 

@@ -95,11 +95,13 @@ class Recipe
 
     /**
      * @ORM\ManyToMany(targetEntity=Allergen::class, mappedBy="recipe")
+     * @Groups({"recipe_browse"})
      */
     private $allergens;
 
     /**
      * @ORM\ManyToMany(targetEntity=Diet::class, mappedBy="recipe")
+     * @Groups({"recipe_browse"})
      */
     private $diets;
 

@@ -39,6 +39,17 @@ class DietRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWhere($name): array
+    {
+       return $this->createQueryBuilder('d')
+           ->andWhere('d.name LIKE :name')
+           ->setParameter('name', '%'. $name .'%')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
+
 //    /**
 //     * @return Diet[] Returns an array of Diet objects
 //     */
