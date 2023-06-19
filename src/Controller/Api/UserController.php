@@ -24,10 +24,17 @@ class UserController extends AbstractController
     public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasherInterface, MemberController $memberController): JsonResponse
     {
 
+        
         /** @var User */
         $newUser = $serializerInterface->deserialize($request->getContent(), User::class, 'json');
 
         $newUser->setPassword($userPasswordHasherInterface->hashPassword($newUser, $newUser->getPassword()));
+
+        $file = "images/user-picture/" . strtolower($newUser->getNickname()) . '-' . uniqid() . '.png';
+
+        file_put_contents($file, base64_decode($newUser->getPicture()));
+
+        $newUser->setPicture($file);
 
         $userRepository->add($newUser, true);
 
