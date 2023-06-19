@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Services\UploadImageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,13 +22,15 @@ class UserController extends AbstractController
     /**
      * @Route("", name="add", methods={"POST"})
      */
-    public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasherInterface, MemberController $memberController): JsonResponse
+    public function add(Request $request, SerializerInterface $serializerInterface, UserRepository $userRepository, UploadImageService $uploadImageService, UserPasswordHasherInterface $userPasswordHasherInterface, MemberController $memberController): JsonResponse
     {
 
         /** @var User */
         $newUser = $serializerInterface->deserialize($request->getContent(), User::class, 'json');
 
         $newUser->setPassword($userPasswordHasherInterface->hashPassword($newUser, $newUser->getPassword()));
+
+        $uploadImageService->upload($newUser);
 
         $userRepository->add($newUser, true);
 
@@ -49,12 +52,14 @@ class UserController extends AbstractController
     /**
      * @Route("", name="edit", methods={"PUT", "PATCH"})
      */
-    public function edit(Request $request, SerializerInterface $serializerInterface, UserPasswordHasherInterface $userPasswordHasherInterface, UserRepository $userRepository): JsonResponse
+    public function edit(Request $request, SerializerInterface $serializerInterface, UploadImageService $uploadImageService, UserPasswordHasherInterface $userPasswordHasherInterface, UserRepository $userRepository): JsonResponse
     {
         /** @var User */
         $user = $serializerInterface->deserialize($request->getContent(), User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
 
         $user->setPassword($userPasswordHasherInterface->hashPassword($user, $user->getPassword()));
+
+        $uploadImageService->upload($user);
 
         $userRepository->add($user, true);
 
