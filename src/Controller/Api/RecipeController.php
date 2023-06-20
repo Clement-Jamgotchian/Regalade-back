@@ -104,6 +104,7 @@ class RecipeController extends AbstractController
 
             $editedRecipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
             $editedRecipe->setMotherRecipe($recipe);
+            $editedRecipe->setIsValidate(false);
             $recipeRepository->add($editedRecipe, true);
 
         } else {

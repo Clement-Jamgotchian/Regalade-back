@@ -139,6 +139,11 @@ class Recipe
      */
     private $duplicateRecipes;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isValidate;
+
 
 
     public function __construct()
@@ -508,6 +513,18 @@ class Recipe
                 $duplicateRecipe->setMotherRecipe(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsValidate(): ?bool
+    {
+        return $this->isValidate;
+    }
+
+    public function setIsValidate(?bool $isValidate): self
+    {
+        $this->isValidate = $isValidate;
 
         return $this;
     }

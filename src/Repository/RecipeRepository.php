@@ -87,6 +87,17 @@ class RecipeRepository extends ServiceEntityRepository
        ;
     }
 
+    public function findNoValidate(): array
+    {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.isValidate IS null OR r.isValidate = 0')
+           ->orderBy('r.createdAt', 'ASC')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
+
 
 
 //    /**

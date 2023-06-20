@@ -4,7 +4,9 @@ namespace App\Controller\Back;
 
 use App\Entity\Recipe;
 use App\Form\RecipeType;
+use App\Repository\ContainsIngredientRepository;
 use App\Repository\RecipeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +23,7 @@ class RecipeController extends AbstractController
     public function index(RecipeRepository $recipeRepository): Response
     {
         return $this->render('back/recipe/index.html.twig', [
-            'recipes' => $recipeRepository->findAll(),
+            'recipes' => $recipeRepository->findNoValidate(),
         ]);
     }
 
@@ -59,12 +61,29 @@ class RecipeController extends AbstractController
     /**
      * @Route("/{id}/edit", name="app_back_recipe_edit", methods={"GET", "POST"})
      */
-    public function edit(Request $request, Recipe $recipe, RecipeRepository $recipeRepository): Response
+    public function edit(Request $request, Recipe $recipe, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): Response
     {
+        $originalContains = new ArrayCollection();
+        foreach($recipe->getContainsIngredients() as $contains)
+        {
+            $originalContains->add($contains);
+        }
+
         $form = $this->createForm(RecipeType::class, $recipe);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // TODO Gerer suppression contains pour Edit
+            dd($recipe->getContainsIngredients());
+            foreach ($originalContains as $contains) {
+                
+                if (false === $recipe->getContainsIngredients()->contains($contains))
+                {
+                    $containsIngredientRepository->remove($contains, true);
+                }
+            }
+
             $recipeRepository->add($recipe, true);
 
             return $this->redirectToRoute('app_back_recipe_index', [], Response::HTTP_SEE_OTHER);
@@ -84,6 +103,17 @@ class RecipeController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$recipe->getId(), $request->request->get('_token'))) {
             $recipeRepository->remove($recipe, true);
         }
+
+        return $this->redirectToRoute('app_back_recipe_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @Route("/{id}/validate", name="app_back_recipe_validate", methods={"GET"})
+     */
+    public function validate(Recipe $recipe, RecipeRepository $recipeRepository): Response
+    {
+        $recipe->setIsValidate(true);
+        $recipeRepository->add($recipe, true);
 
         return $this->redirectToRoute('app_back_recipe_index', [], Response::HTTP_SEE_OTHER);
     }
