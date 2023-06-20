@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -96,6 +97,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user")
      */
     private $comments;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
 
 
 
@@ -435,6 +446,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Gets triggered only on insert
+
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    /**
+     * Gets triggered every time on update
+
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
+    }
     
 }
 
