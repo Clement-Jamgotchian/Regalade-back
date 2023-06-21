@@ -121,7 +121,7 @@ class FridgeController extends AbstractController
     /**
     * @Route("/clean/{id}", name="clean", requirements={"id"="\d+"}, methods={"POST"})
     */
-    public function clean(?Recipe $recipe, RecipeListRepository $recipeListRepository, CompareQuantityService $compareQuantityService): JsonResponse
+    public function clean(?Recipe $recipe, RecipeListRepository $recipeListRepository, CompareQuantityService $compareQuantityService, ListController $listController)
     {
         /** @var User */
         $user = $this->getUser();
@@ -139,6 +139,7 @@ class FridgeController extends AbstractController
 
         $compareQuantityService->cleanFridge($recipeOnList);
 
-        return $this->json(["message" => "Les ingrédients de la recette ont été supprimé du frigo"], Response::HTTP_OK);
+        return $listController->delete($recipe, $recipeListRepository);
+
     }
 }
