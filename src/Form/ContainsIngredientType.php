@@ -16,9 +16,9 @@ class ContainsIngredientType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('quantity', IntegerType::class)
+            ->add('quantity', IntegerType::class, ["label" => "Quantité", "attr" => ["class" => "bg-primary"]])
             // ->add('recipe', EntityType::class, ["multiple" => false, "expanded" => false, "class" => Recipe::class, "choice_label" => "title"])
-            ->add('ingredient', EntityType::class, ["multiple" => false, "expanded" => false, "class" => Ingredient::class, "choice_label" => "name"])
+            ->add('ingredient', EntityType::class, ["multiple" => false, "expanded" => false, "class" => Ingredient::class, "choice_label" => "name", "label" => "Ingrédient", "attr" => ["class" => "bg-primary"]])
         ;
     }
 

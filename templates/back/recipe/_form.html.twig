@@ -1,15 +1,26 @@
 {{ form_start(form) }}
     {{ form_row(form.title) }}
+    {{ form_row(form.description)}}
+    {{ form_row(form.picture)}}
+    {{ form_row(form.cookingDuration)}}
+    {{ form_row(form.setupDuration)}}
+    {{ form_row(form.step)}}
+    {{ form_row(form.difficulty)}}
+    {{ form_row(form.portions)}}
+    {{ form_row(form.category)}}
+    {{ form_row(form.allergens)}}
+    {{ form_row(form.diets)}}
 
     <ul class="tags" data-prototype="{{ form_widget(form.containsIngredients.vars.prototype)|e }}">
-
+    <h2 class="text-primary fw-bold">Ingrédients</h2>
             {% for contains in form.containsIngredients %}
-            <li>{{ form_row(contains.ingredient) }}</li>
+            <li>{{form_row(contains.quantity)}}{{ form_row(contains.ingredient) }}</li>
         {% endfor %}
+            <button type="button" class="btn btn-info add_item_link" data-collection-holder-class="tags">Ajouter un ingrédient</button>
     </ul>
 
-    <button type="button" class="add_item_link" data-collection-holder-class="tags">Add a tag</button>
-    <button class="btn">{{ button_label|default('Save') }}</button>
+
+    <button class="btn btn-success col-8">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
 
 <script>
@@ -36,7 +47,8 @@
 
 const addTagFormDeleteLink = (item) => {
     const removeFormButton = document.createElement('button');
-    removeFormButton.innerText = 'Delete this tag';
+    removeFormButton.innerText = 'Supprimer cet ingrédient';
+    removeFormButton.classList.add("btn", "btn-primary");
 
     item.append(removeFormButton);
 

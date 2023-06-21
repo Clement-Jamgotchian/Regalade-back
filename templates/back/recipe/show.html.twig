@@ -3,11 +3,11 @@
 {% block title %}Recette{% endblock %}
 
 {% block body %}
-    <h1 class="text-dark">Recette</h1>
+    <h1 class="text-primary fw-bold">{{recipe.title}}</h1>
 
-    <table class="table table-dark table-striped-columns text-center">
+    <table class="table table-primary table-striped-columns text-center">
         <tbody>
-                    <tr>
+            <tr>
                 <th>Image</th>
                 <td>{% if recipe.picture is not null %}<img src="{{ asset(recipe.picture) }}" class="img-thumbnail" style="width: 18rem;" alt="">{% else %} Pas d'image{% endif %}</td>
             </tr>
@@ -15,7 +15,7 @@
                 <th>Auteur</th>
                 <td>{{ recipe.user.nickname ?? '/' }}</td>
             </tr>
-                        <tr>
+            <tr>
                 <th>Créée le</th>
                 <td>{{ recipe.createdAt ? recipe.createdAt|date('d-m-Y H:i:s') : '/' }}</td>
             </tr>
@@ -24,31 +24,39 @@
                 <td>{{ recipe.title }}</td>
             </tr>
             <tr>
-            <th>Catégorie</th>
-            <td>{{recipe.category.title}}</td></tr>
-                        <tr>
+                <th>Catégorie</th>
+                <td>{{recipe.category.title}}</td>
+            </tr>
+            <tr>
                 <th>Temps de préparation</th>
                 <td>{{ recipe.setupDuration }} min</td>
             </tr>
-                        <tr>
+            <tr>
                 <th>Temps de cuisson</th>
                 <td>{{ recipe.cookingDuration }} min</td>
             </tr>
-                        <tr>
+            <tr>
                 <th>Difficulté</th>
                 <td>{{ recipe.difficulty }}</td>
             </tr>
             <tr>
-            <th>Allergènes</th>
-            <td><ul>{% for allergen in recipe.allergens %}
-                <li>{{allergen.Name}}</li>
-            {% else %}Pas d'allergènes{% endfor %}</ul></td></tr>
+                <th>Allergènes</th>
+                <td>
+                    <ul>{% for allergen in recipe.allergens %}
+                        <li>{{allergen.Name}}</li>
+                        {% else %}Pas d'allergènes{% endfor %}
+                    </ul>
+                </td>
+            </tr>
             <tr>
-                        <tr>
-            <th>Allergènes</th>
-            <td><ul>{% for diet in recipe.diets %}
-                <li>{{diet.name}}</li>
-            {% else %}Pas de régime{% endfor %}</ul></td></tr>
+                <th>Allergènes</th>
+                <td>
+                    <ul>{% for diet in recipe.diets %}
+                        <li>{{diet.name}}</li>
+                        {% else %}Pas de régime{% endfor %}
+                    </ul>
+                </td>
+            </tr>
             <tr>
                 <th>Description</th>
                 <td>{{ recipe.description ?? "Non renseignée" }}</td>
@@ -57,14 +65,16 @@
                 <th>Etapes</th>
                 <td>{{ recipe.step }}</td>
             </tr>
-            <tr><th>Ingrédients</th>
-            <td><ul>
-            {% for ingredient in recipe.containsIngredients %}
-                <li>{{ingredient.ingredient.name}} : {{ingredient.quantity}} {{ingredient.ingredient.unit}}</li>
-            {% endfor %}
-            </ul></td></tr>
-
-
+            <tr>
+                <th>Ingrédients</th>
+                <td>
+                    <ul>
+                        {% for ingredient in recipe.containsIngredients %}
+                        <li>{{ingredient.ingredient.name}} : {{ingredient.quantity}} {{ingredient.ingredient.unit}}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
             <tr>
                 <th>Portions</th>
                 <td>{{ recipe.portions }}</td>
@@ -73,7 +83,6 @@
                 <th>Note</th>
                 <td>{{ recipe.rating }}</td>
             </tr>
-
         </tbody>
     </table>
 

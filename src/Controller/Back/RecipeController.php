@@ -73,14 +73,14 @@ class RecipeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            dd($form);
             // TODO Gerer suppression contains pour Edit
-            dd($recipe->getContainsIngredients());
+            dd($recipe);
             foreach ($originalContains as $contains) {
                 
                 if (false === $recipe->getContainsIngredients()->contains($contains))
                 {
-                    $containsIngredientRepository->remove($contains, true);
+                    $recipe->removeContainsIngredient($contains);
                 }
             }
 

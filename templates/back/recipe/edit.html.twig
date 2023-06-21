@@ -3,7 +3,7 @@
 {% block title %}Edit Recipe{% endblock %}
 
 {% block body %}
-    <h1>Edit Recipe</h1>
+    <h1 class="text-primary fw-bold">{{recipe.title}}</h1>
 
     {{ include('back/recipe/_form.html.twig', {'button_label': 'Update'}) }}
 
