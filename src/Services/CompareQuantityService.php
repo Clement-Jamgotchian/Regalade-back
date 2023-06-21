@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
 class CompareQuantityService
@@ -122,6 +123,31 @@ class CompareQuantityService
         }
 
         return $substract;
+    }
+
+    public function addToFridgeAfterCart($cart)
+    {
+        if(count($cart) == 0)
+        {
+            return ["Panier vide, impossible de transférer vers le frigo", Response::HTTP_BAD_REQUEST];
+        }
+
+        foreach ($cart as $cartElement) {
+            $ingredient = $cartElement->getIngredient();
+            $quantity = $cartElement->getQuantity();
+
+            $fridgeElement = $this->fridgeRepository->findOneByIngredient($ingredient, $this->user) ?? new Fridge();
+    
+            $fridgeElement->setIngredient($ingredient)
+                          ->setUser($this->user)
+                          ->setQuantity(round($quantity + $fridgeElement->getQuantity()));
+
+            $this->fridgeRepository->add($fridgeElement, true);
+            $this->cartRepository->remove($cartElement, true);
+        }
+
+        return ["Tous les éléments du panier ont été transféré vers le frigo", Response::HTTP_ACCEPTED];
+
     }
 
 }
