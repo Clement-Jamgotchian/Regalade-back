@@ -87,6 +87,19 @@ class RecipeRepository extends ServiceEntityRepository
        ;
     }
 
+    public function findAllergen($allergen): array
+    {
+       return $this->createQueryBuilder('r')
+           ->innerJoin('r.allergen', 'a')
+           ->andWhere('a.name != :allergen')
+           ->andWhere('r.motherRecipe IS null')
+           ->setParameter('allergen', $allergen)
+           ->orderBy('r.rating', 'DESC')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
 
 
 //    /**
