@@ -66,9 +66,13 @@ class RecipeController extends AbstractController
             $recipes = $recipeRepository->findMotherRecipes();
         }
 
-        foreach ($recipes as $recipe) {
+        foreach ($recipes as $key => $recipe) {
             if (in_array($recipe, $allergenRecipes)) {
+                unset($recipes[$key]);
+            }
 
+            if (in_array($recipe, $noDietRecipes)) {
+                unset($recipes[$key]);
             }
         }
 
