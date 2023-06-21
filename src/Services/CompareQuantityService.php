@@ -10,21 +10,18 @@ use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
 class CompareQuantityService
 {
-    private $entityManagerInterface;
     private $fridgeRepository;
     private $cartRepository;
     /** @var User */
     private $user;
 
-    public function __construct(EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository, Security $security, CartRepository $cartRepository)
+    public function __construct(FridgeRepository $fridgeRepository, Security $security, CartRepository $cartRepository)
     {
-        $this->entityManagerInterface = $entityManagerInterface;
         $this->fridgeRepository = $fridgeRepository;
         $this->user = $security->getUser();
         $this->cartRepository = $cartRepository;
