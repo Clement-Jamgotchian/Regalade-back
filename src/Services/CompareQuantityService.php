@@ -104,7 +104,7 @@ class CompareQuantityService
 
             $cart->setIngredient($containsIngredientElement->getIngredient())
                     ->setUser($this->user)
-                    ->setQuantity(round($quantityToSet + $cart->getQuantity()));
+                    ->setQuantity((round($quantityToSet + $cart->getQuantity()) < 1) ? 1 : round($quantityToSet + $cart->getQuantity()));
 
             $this->cartRepository->add($cart, true);
 
@@ -163,7 +163,7 @@ class CompareQuantityService
 
                     $quantity = ($contains->getQuantity() * $proportion);
 
-                    if (($fridgeElement->getQuantity() - $quantity) <= 0) {
+                    if (($fridgeElement->getQuantity() - $quantity) < 1) {
                         $this->fridgeRepository->remove($fridgeElement, true);
                     } else {
                         $fridgeElement->setQuantity($fridgeElement->getQuantity() - $quantity);
