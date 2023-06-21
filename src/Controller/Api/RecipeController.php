@@ -3,7 +3,9 @@
 namespace App\Controller\Api;
 
 use App\Entity\Recipe;
+use App\Repository\AllergenRepository;
 use App\Repository\ContainsIngredientRepository;
+use App\Repository\DietRepository;
 use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
 use Knp\Component\Pager\PaginatorInterface;
@@ -22,12 +24,52 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface, AllergenRepository $allergenRepository, DietRepository $dietRepository): JsonResponse
     {
+        $allergenRecipes = [];
+        if(!is_null($request->query->get('allergen')))
+        {
+            /** @var array */
+            $allergens = $request->query->get('allergen');
+            foreach ($allergens as $allergen) {
+                $concernAllergen = $allergenRepository->findWhere($allergen);
+                $associatedRecipes = $concernAllergen->getRecipe();
+
+                foreach ($associatedRecipes as $recipe) {
+                    $allergenRecipes[] = $recipe;
+                }
+            }
+        }
+
+        $noDietRecipes = [];
+        if(!is_null($request->query->get('diet')))
+        {
+            /** @var array */
+            $diets = $request->query->get('diet');
+            foreach ($diets as $diet) {
+                $concernDiet = $dietRepository->findWhere($diet);
+                $associatedRecipes = $concernDiet->getRecipe();
+
+                foreach($recipeRepository->findAll() as $recipe)
+                {
+                    if (!$concernDiet->getRecipe()->contains($recipe))
+                    {
+                        $noDietRecipes[] = $recipe;
+                    }
+                }
+            }
+        }
+
         if(!is_null($request->query->get('search'))) {
             $recipes = $recipeRepository->findWhere($request->query->get('search'));
         } else {
             $recipes = $recipeRepository->findMotherRecipes();
+        }
+
+        foreach ($recipes as $recipe) {
+            if (in_array($recipe, $allergenRecipes)) {
+
+            }
         }
 
         $recipesWithPagination = $paginatorInterface->paginate(
