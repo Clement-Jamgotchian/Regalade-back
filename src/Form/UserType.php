@@ -48,21 +48,6 @@ class UserType extends AbstractType
         ;
     }
 
-    //     $builder
-    //             ->add('email')
-    //             ->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
-    //                 $builder = $event->getForm();                    
-    //             })
-    //             ->add('roles', ChoiceType::class, [
-    //                 "multiple" => true,
-    //                 "expanded" => true,
-    //                 "choices" => [
-    //                     "ADMIN" => "ROLE_ADMIN",
-    //                     "USER" => "ROLE_USER"
-    //                 ]
-    //             ]);
-    // }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
