@@ -6,6 +6,7 @@ use App\Entity\Cart;
 use App\Entity\ContainsIngredient;
 use App\Entity\Fridge;
 use App\Entity\Recipe;
+use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
@@ -147,6 +148,33 @@ class CompareQuantityService
         }
 
         return ["Tous les éléments du panier ont été transféré vers le frigo", Response::HTTP_ACCEPTED];
+
+    }
+
+    public function cleanFridge(RecipeList $recipeList)
+    {
+
+        $fridge = $this->user->getFridges();
+        foreach ($fridge as $fridgeElement) {
+            foreach ($recipeList->getRecipe()->getContainsIngredients() as $contains)
+            {
+                if ($fridgeElement->getIngredient() === $contains->getIngredient())
+                {
+                    $recipePortions = $recipeList->getRecipe()->getPortions();
+                    $portionsWanted = $recipeList->getPortions();
+                    $proportion = $portionsWanted / $recipePortions;
+
+                    $quantity = ($contains->getQuantity() * $proportion);
+
+                    if (($fridgeElement->getQuantity() - $quantity) <= 0) {
+                        $this->fridgeRepository->remove($fridgeElement, true);
+                    } else {
+                        $fridgeElement->setQuantity($fridgeElement->getQuantity() - $quantity);
+                        $this->fridgeRepository->add($fridgeElement, true);
+                    }
+                }
+            }
+        }
 
     }
 
