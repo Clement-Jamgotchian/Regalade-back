@@ -4,9 +4,12 @@ namespace App\Controller\Api;
 
 use App\Entity\Fridge;
 use App\Entity\Ingredient;
+use App\Entity\Recipe;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
+use App\Repository\RecipeListRepository;
 use App\Services\AddEditDeleteService;
+use App\Services\CompareQuantityService;
 use App\Services\SuggestionsByFridgeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,5 +116,29 @@ class FridgeController extends AbstractController
         $suggestions = $suggestionsByFridgeService->makeSuggestions();
 
         return $this->json($suggestions['content'], $suggestions['code'], [], ['groups' => ["recipe_browse", "ingredient_suggestion"]]);
+    }
+
+    /**
+    * @Route("/clean/{id}", name="clean", requirements={"id"="\d+"}, methods={"POST"})
+    */
+    public function clean(?Recipe $recipe, RecipeListRepository $recipeListRepository, CompareQuantityService $compareQuantityService): JsonResponse
+    {
+        /** @var User */
+        $user = $this->getUser();
+
+        if ($recipe === null)
+        {
+            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+
+        $recipeOnList = $recipeListRepository->findOneByRecipe($recipe, $this->getUser());
+
+        if (!$recipeOnList) {
+            return $this->json(['message' => "Cette recette n'est dans la liste des repas"], Response::HTTP_NOT_FOUND, []);
+        }
+
+        $compareQuantityService->cleanFridge($recipeOnList);
+
+        return $this->json(["message" => "Les ingrédients de la recette ont été supprimé du frigo"], Response::HTTP_OK);
     }
 }
