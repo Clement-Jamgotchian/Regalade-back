@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=IngredientRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Ingredient
 {
@@ -18,28 +19,39 @@ class Ingredient
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_read"})
+     * @Groups({"ingredient_browse"})
+     * @Groups({"ingredient_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_read"})
+     * @Groups({"ingredient_browse"})
+     * @Groups({"ingredient_suggestion"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"ingredient_read"})
      */
     private $isCold;
 
     /**
      * @ORM\Column(type="string", length=10)
      * @Groups({"recipe_read"})
+     * @Groups({"ingredient_read"})
+     * @Groups({"ingredient_browse"})
+     * @Groups({"ingredient_suggestion"})
      */
     private $unit;
 
     /**
      * @ORM\ManyToOne(targetEntity=Department::class, inversedBy="ingredients")
+     * @Groups({"ingredient_read"})
      */
     private $department;
 
@@ -48,9 +60,36 @@ class Ingredient
      */
     private $containsIngredients;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Fridge::class, mappedBy="ingredient")
+     */
+    private $fridges;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="ingredient")
+     * 
+     */
+    private $carts;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
+
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
+
+        $this->fridges = new ArrayCollection();
+
+        $this->carts = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -134,5 +173,110 @@ class Ingredient
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Fridge>
+     */
+    public function getFridges(): Collection
+    {
+        return $this->fridges;
+    }
+
+    public function addFridge(Fridge $fridge): self
+    {
+        if (!$this->fridges->contains($fridge)) {
+            $this->fridges[] = $fridge;
+            $fridge->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cart>
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): self
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts[] = $cart;
+            $cart->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+
+    public function removeFridge(Fridge $fridge): self
+    {
+        if ($this->fridges->removeElement($fridge)) {
+            // set the owning side to null (unless already changed)
+            if ($fridge->getIngredient() === $this) {
+                $fridge->setIngredient(null);
+            }
+        }
+      return $this;
+    }
+
+    public function removeCart(Cart $cart): self
+    {
+        if ($this->carts->removeElement($cart)) {
+            // set the owning side to null (unless already changed)
+            if ($cart->getIngredient() === $this) {
+                $cart->setIngredient(null);
+
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Gets triggered only on insert
+
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    /**
+     * Gets triggered every time on update
+
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
     }
 }

@@ -39,6 +39,16 @@ class IngredientRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWhere($name): array
+    {
+       return $this->createQueryBuilder('i')
+           ->andWhere('i.name LIKE :name')
+           ->setParameter('name', '%'. $name .'%')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
 //    /**
 //     * @return Ingredient[] Returns an array of Ingredient objects
 //     */

@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=RecipeRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Recipe
 {
@@ -24,12 +25,13 @@ class Recipe
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups({"recipe_browse"})
+     * @Groups({"comment_read"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"recipe_browse"})
+     * @Groups({"recipe_read"})
      */
     private $description;
 
@@ -70,14 +72,83 @@ class Recipe
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe")
+     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist"})
      * @Groups({"recipe_read"})
      */
     private $containsIngredients;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"recipe_browse"})
+     * @Groups({"comment_read"})
+     */
+    private $rating;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="favoriteRecipes")
+     */
+    private $users;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recipes")
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Allergen::class, mappedBy="recipe")
+     * @Groups({"recipe_browse"})
+     */
+    private $allergens;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Diet::class, mappedBy="recipe")
+     * @Groups({"recipe_browse"})
+     */
+    private $diets;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="recipe")
+     * @Groups({"recipe_read"})
+     */
+    private $comments;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"recipe_browse"})
+     */
+    private $portions;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Recipe::class, inversedBy="duplicateRecipes")
+     */
+    private $motherRecipe;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Recipe::class, mappedBy="motherRecipe")
+     * @Groups({"recipe_duplicate"})
+     */
+    private $duplicateRecipes;
+
+
+
     public function __construct()
     {
         $this->containsIngredients = new ArrayCollection();
+        $this->users = new ArrayCollection();
+        $this->allergens = new ArrayCollection();
+        $this->diets = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->duplicateRecipes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -210,4 +281,236 @@ class Recipe
 
         return $this;
     }
+
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): self
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addFavoriteRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+    if ($this->users->removeElement($user)) {
+        $user->removeFavoriteRecipe($this);
+    }
+
+    return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Allergen>
+     */
+    public function getAllergens(): Collection
+    {
+        return $this->allergens;
+    }
+
+    public function addAllergen(Allergen $allergen): self
+    {
+        if (!$this->allergens->contains($allergen)) {
+            $this->allergens[] = $allergen;
+            $allergen->addRecipe($this); 
+        }
+       return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setRecipe($this);
+        }
+        return $this;
+    }
+
+    public function removeAllergen(Allergen $allergen): self
+    {
+        if ($this->allergens->removeElement($allergen)) {
+            $allergen->removeRecipe($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Diet>
+     */
+    public function getDiets(): Collection
+    {
+        return $this->diets;
+    }
+
+    public function addDiet(Diet $diet): self
+    {
+        if (!$this->diets->contains($diet)) {
+            $this->diets[] = $diet;
+            $diet->addRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiet(Diet $diet): self
+    {
+        if ($this->diets->removeElement($diet)) {
+            $diet->removeRecipe($this);
+        }
+      return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getRecipe() === $this) {
+                $comment->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPortions(): ?int
+    {
+        return $this->portions;
+    }
+
+    public function setPortions(?int $portions): self
+    {
+        $this->portions = $portions;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Gets triggered only on insert
+
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    /**
+     * Gets triggered every time on update
+
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
+    }
+
+    public function getMotherRecipe(): ?self
+    {
+        return $this->motherRecipe;
+    }
+
+    public function setMotherRecipe(?self $motherRecipe): self
+    {
+        $this->motherRecipe = $motherRecipe;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getDuplicateRecipes(): Collection
+    {
+        return $this->duplicateRecipes;
+    }
+
+    public function addDuplicateRecipe(self $duplicateRecipe): self
+    {
+        if (!$this->duplicateRecipes->contains($duplicateRecipe)) {
+            $this->duplicateRecipes[] = $duplicateRecipe;
+            $duplicateRecipe->setMotherRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDuplicateRecipe(self $duplicateRecipe): self
+    {
+        if ($this->duplicateRecipes->removeElement($duplicateRecipe)) {
+            // set the owning side to null (unless already changed)
+            if ($duplicateRecipe->getMotherRecipe() === $this) {
+                $duplicateRecipe->setMotherRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
+
