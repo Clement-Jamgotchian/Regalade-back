@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -20,8 +21,8 @@ class UserType extends AbstractType
     {
         /** @var User $user */
         $builder
-            ->add('email')
-            ->add('nickname')
+            ->add('email', EmailType::class, ["label" => "Adresse mail", "attr" => ["class" => "bg-primary", "placeholder" => "adresse@mail.com"]])
+            ->add('nickname', TextType::class, ["label" => "Pseudo", "attr" => ["class" => "bg-primary", "placeholder" => "Pseudo"]] )
             ->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
                 $builder = $event->getForm();
                 $user = $event->getData();
@@ -42,7 +43,7 @@ class UserType extends AbstractType
                 "choices" => [
                     "ADMIN" => "ROLE_ADMIN",
                     "USER" => "ROLE_USER",
-                ]
+                ], "label" => "Roles", "attr" => ["class" => "bg-primary"]
             ])
         ;
     }

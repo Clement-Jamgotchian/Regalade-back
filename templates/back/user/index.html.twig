@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User index{% endblock %}
+{% block title %}Liste des utilisateurs{% endblock %}
 
 {% block body %}
-    <h1>User index</h1>
+    <h1 class="text-primary fw-bold">Liste des utilisateurs</h1>
 
-    <table class="table">
+    <table class="table table-primary table-striped-columns text-center align-middle">
         <thead>
             <tr>
                 <th>Id</th>
@@ -23,13 +23,13 @@
                 <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
                 <td>{{ user.nickname }}</td>
                 <td>
-                    <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+                    <a class="btn btn-primary" href="{{ path('app_user_show', {'id': user.id}) }}">Voir</a>
+                    <a class="btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Editer</a>
                 </td>
             </tr>
         {% endfor %}    
         </tbody>
     </table>
 
-    <a href="{{ path('app_user_new') }}">Create new</a>
+    <a class="btn btn-secondary" href="{{ path('app_user_new') }}">Créer un nouvel utilisateur</a>
 {% endblock %}
