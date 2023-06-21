@@ -36,7 +36,7 @@ class RecipeType extends AbstractType
             ->add('category', EntityType::class, ["multiple" => false, "expanded" => false, "class" => Category::class, "choice_label" => "title", "label" => "Catégorie", "attr" => ["class" => "bg-primary text-dark"]])
             ->add('allergens', EntityType::class, ["multiple" => true, "expanded" => true, "class" => Allergen::class, "choice_label" => "name", "label" => "Allergies", "attr" => ["class" => "bg-primary"]])
             ->add('diets', EntityType::class, ["multiple" => true, "expanded" => true, "class" => Diet::class, "choice_label" => "name", "label" => "Régimes", "attr" => ["class" => "bg-primary"]] )
-            ->add('containsIngredients', CollectionType::class, ['entry_type' => ContainsIngredientType::class, "allow_add" => true, "allow_delete" => true, "prototype" => true, "by_reference" => false])
+            ->add('containsIngredients', CollectionType::class, ['entry_type' => ContainsIngredientType::class, "allow_add" => true, "allow_delete" => true, "prototype" => true, "by_reference" => false, "label" => "Ingrédients", "attr" => ["class" => "bg-primary"]])
         ;
     }
 
