@@ -106,7 +106,6 @@ class RecipeRepository extends ServiceEntityRepository
            ->andWhere('r.motherRecipe IS null')
            ->setParameter('allergen', $allergen)
            ->orderBy('r.rating', 'DESC')
-
            ->getQuery()
            ->getResult()
        ;
