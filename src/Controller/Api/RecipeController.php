@@ -3,9 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\Recipe;
+use App\Repository\AllergenRepository;
 use App\Repository\ContainsIngredientRepository;
+use App\Repository\DietRepository;
 use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
+use App\Services\AllergenDietService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,12 +25,31 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface, AllergenDietService $allergenDietService): JsonResponse
     {
+        
         if(!is_null($request->query->get('search'))) {
             $recipes = $recipeRepository->findWhere($request->query->get('search'));
         } else {
             $recipes = $recipeRepository->findMotherRecipes();
+        }
+
+        $allergenRecipes = $allergenDietService->hideRecipesWithAllergen();
+        if (!empty($allergenRecipes)) {
+            foreach ($recipes as $key => $recipe) {
+                if (in_array($recipe, $allergenRecipes)) {
+                    unset($recipes[$key]);
+                }
+            }
+        }
+
+        $noDietRecipes = $allergenDietService->hideRecipesWithoutDiet();
+        if (!empty($noDietRecipes)) {
+            foreach ($recipes as $key => $recipe) {
+                if (in_array($recipe, $noDietRecipes)) {
+                    unset($recipes[$key]);
+                }
+            }
         }
 
         $recipesWithPagination = $paginatorInterface->paginate(
