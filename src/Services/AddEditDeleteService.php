@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Comment;
 use App\Entity\Ingredient;
+use App\Entity\Recipe;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,6 +84,10 @@ class AddEditDeleteService
         $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $entity]);
 
         $this->uploadImageService->upload($entity);
+
+        if($entityClass === Recipe::class) {
+            $entity->setIsValidate(false);
+        }
 
         $repository->add($entity, true);
 

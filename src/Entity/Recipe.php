@@ -7,10 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @ORM\Entity(repositoryClass=RecipeRepository::class)
  * @ORM\HasLifecycleCallbacks
+ * @Vich\Uploadable
  */
 class Recipe
 {
@@ -40,6 +43,12 @@ class Recipe
      * @Groups({"recipe_browse"})
      */
     private $picture;
+
+    /**
+     * @Vich\UploadableField(mapping="recipePicture", fileNameProperty="picture")
+     * @var File|null
+     */
+    private $pictureFile;
 
     /**
      * @ORM\Column(type="integer")
@@ -72,7 +81,7 @@ class Recipe
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist", "remove"})
      * @Groups({"recipe_read"})
      */
     private $containsIngredients;
@@ -138,6 +147,11 @@ class Recipe
      * @Groups({"recipe_duplicate"})
      */
     private $duplicateRecipes;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isValidate;
 
 
 
@@ -510,6 +524,31 @@ class Recipe
         }
 
         return $this;
+    }
+
+    public function isIsValidate(): ?bool
+    {
+        return $this->isValidate;
+    }
+
+    public function setIsValidate(?bool $isValidate): self
+    {
+        $this->isValidate = $isValidate;
+
+        return $this;
+    }
+
+    public function setPictureFile(?File $pictureFile = null): void
+    {
+        $this->pictureFile = $pictureFile;
+        if (null !== $pictureFile) {
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getPictureFile()
+    {
+        return $this->pictureFile;
     }
 
 }

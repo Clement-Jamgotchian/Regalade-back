@@ -87,6 +87,17 @@ class RecipeRepository extends ServiceEntityRepository
        ;
     }
 
+
+    public function findNoValidate(): array
+    {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.isValidate IS null OR r.isValidate = 0')
+           ->orderBy('r.createdAt', 'ASC')
+            ->getQuery()
+           ->getResult()
+       ;
+    }
+
     public function findAllergen($allergen): array
     {
        return $this->createQueryBuilder('r')
@@ -95,11 +106,11 @@ class RecipeRepository extends ServiceEntityRepository
            ->andWhere('r.motherRecipe IS null')
            ->setParameter('allergen', $allergen)
            ->orderBy('r.rating', 'DESC')
+
            ->getQuery()
            ->getResult()
        ;
     }
-
 
 
 //    /**
