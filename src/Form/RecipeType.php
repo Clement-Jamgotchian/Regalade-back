@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class RecipeType extends AbstractType
 {
@@ -28,7 +29,7 @@ class RecipeType extends AbstractType
         $builder
             ->add('title', TextType::class, ["label" => "Titre", "attr" => ["class" => "bg-primary", "placeholder" => "Le titre de la recette"]])
             ->add('description', TextareaType::class, ["label" => "Description", "attr" => ["class" => "bg-primary", "placeholder" => "Description (pas obligatoire)"]] )
-            // ->add('picture', FileType::class, ["label" => "Illustration", "attr" => ["class" => "bg-primary"]])
+            ->add('pictureFile', VichImageType::class, ["label" => "Illustration", "attr" => ["class" => "bg-primary"], "allow_delete" => true, "delete_label" => "Supprimer l'image", "download_link" => false])
             ->add('cookingDuration', IntegerType::class, ["label" => "Temps de cuisson (en minutes)", "attr" => ["class" => "bg-primary", "value" => 10]])
             ->add('setupDuration', IntegerType::class, ["label" => "Temps de préparation (en minutes)", "attr" => ["class" => "bg-primary", "value" => 15]])
             ->add('step', TextareaType::class, ["label" => "Etapes", "attr" => ["class" => "bg-primary", "placeholder" => "Les étapes de la recette"]])
@@ -45,6 +46,7 @@ class RecipeType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Recipe::class,
+            "attr" => ["novalidate" => "novalidate"]
         ]);
     }
 }

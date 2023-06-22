@@ -1,7 +1,7 @@
 {{ form_start(form) }}
     {{ form_row(form.title) }}
     {{ form_row(form.description)}}
-    {# {{ form_row(form.picture)}} #}
+    {{ form_row(form.pictureFile)}}
     {{ form_row(form.setupDuration)}}
     {{ form_row(form.cookingDuration)}}
     {{ form_row(form.step)}}
@@ -21,6 +21,7 @@
 
 
     <button class="btn btn-success col-8">{{ button_label|default('Créer') }}</button>
+    {{ form_row(form._token) }}
 {{ form_end(form, {'render_rest': false}) }}
 
 <script>

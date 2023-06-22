@@ -27,3 +27,6 @@ services:
         arguments: 
             [ '@security.token_storage' ]
 
+    App\Naming\RecipeNamer:
+        public: true
+

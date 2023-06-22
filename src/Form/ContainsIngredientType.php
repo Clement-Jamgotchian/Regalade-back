@@ -32,6 +32,7 @@ class ContainsIngredientType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ContainsIngredient::class,
+            "attr" => ["novalidate" => "novalidate"]
         ]);
     }
 }
