@@ -1,9 +1,9 @@
 {{ form_start(form) }}
     {{ form_row(form.title) }}
     {{ form_row(form.description)}}
-    {{ form_row(form.picture)}}
-    {{ form_row(form.cookingDuration)}}
+    {# {{ form_row(form.picture)}} #}
     {{ form_row(form.setupDuration)}}
+    {{ form_row(form.cookingDuration)}}
     {{ form_row(form.step)}}
     {{ form_row(form.difficulty)}}
     {{ form_row(form.portions)}}
@@ -11,17 +11,17 @@
     {{ form_row(form.allergens)}}
     {{ form_row(form.diets)}}
 
-    <ul class="tags" data-prototype="{{ form_widget(form.containsIngredients.vars.prototype)|e }}">
-    <h2 class="text-primary fw-bold">Ingrédients</h2>
+    <ul class="tags d-flex flex-column align-items-center" data-prototype="{{ form_widget(form.containsIngredients.vars.prototype)|e }}">
+    <label class="form-label col-12">Ingrédients</label>
             {% for contains in form.containsIngredients %}
-            <div class="d-flex mb-3">{{form_widget(contains.quantity)}}{{ form_widget(contains.ingredient) }}</div>
+            <div class="mb-3 col-5">{{form_widget(contains.quantity)}}{{ form_widget(contains.ingredient) }}</div>
         {% endfor %}
             <button type="button" class="btn btn-info add_item_link" data-collection-holder-class="tags">Ajouter un ingrédient</button>
     </ul>
 
 
     <button class="btn btn-success col-8">{{ button_label|default('Créer') }}</button>
-{{ form_end(form) }}
+{{ form_end(form, {'render_rest': false}) }}
 
 <script>
   
@@ -29,7 +29,7 @@
   const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
 
   const item = document.createElement('div');
-  item.classList.add("d-flex", "mb-3");
+  item.classList.add("mb-3", "col-5");
 
   item.innerHTML = collectionHolder
     .dataset
@@ -49,7 +49,7 @@
 const addTagFormDeleteLink = (item) => {
     const removeFormButton = document.createElement('button');
     removeFormButton.innerText = 'Supprimer cet ingrédient';
-    removeFormButton.classList.add("btn", "btn-primary", "col-3");
+    removeFormButton.classList.add("btn", "btn-primary", "mt-1");
 
     item.append(removeFormButton);
 

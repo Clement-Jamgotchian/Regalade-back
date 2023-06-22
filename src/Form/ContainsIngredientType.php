@@ -17,14 +17,12 @@ class ContainsIngredientType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('quantity', IntegerType::class, ["label" => "Quantité", "attr" => ["class" => "bg-primary"]])
-            // ->add('recipe', EntityType::class, ["multiple" => false, "expanded" => false, "class" => Recipe::class, "choice_label" => "title"])
+            ->add('quantity', IntegerType::class, ["label" => false, "attr" => ["class" => "bg-primary", "value" => 5]])
             ->add('ingredient', EntityType::class, ["multiple" => false, "expanded" => false, "class" => Ingredient::class, "choice_label" => function ($entity)
             {
                 /** @var Ingredient $entity */
                 return $entity->getName() . " - (" . $entity->getUnit() . ")";
-            }, "label" => "Ingrédient", "attr" => ["class" => "bg-primary"], "query_builder" => function(EntityRepository $entityrepository){
-                // TODO : requete perso : tri par titre
+            }, "label" => false, "attr" => ["class" => "bg-primary"], "query_builder" => function(EntityRepository $entityrepository){
                 return $entityrepository->createQueryBuilder('i')
                     ->orderBy('i.name', 'ASC');}])
         ;

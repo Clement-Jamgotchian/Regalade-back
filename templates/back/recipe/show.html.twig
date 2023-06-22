@@ -8,7 +8,7 @@
     <table class="table table-primary table-striped-columns text-center">
         <tbody>
             <tr>
-                <th>Image</th>
+                <th class="col-2">Image</th>
                 <td>{% if recipe.picture is not null %}<img src="{{ asset(recipe.picture) }}" class="img-thumbnail" style="width: 18rem;" alt="">{% else %} Pas d'image{% endif %}</td>
             </tr>
             <tr>
@@ -21,7 +21,7 @@
             </tr>
             <tr>
                 <th>Titre</th>
-                <td>{{ recipe.title }}</td>
+                <td><span class="fw-bold">{{ recipe.title }}</span></td>
             </tr>
             <tr>
                 <th>Catégorie</th>
@@ -37,21 +37,21 @@
             </tr>
             <tr>
                 <th>Difficulté</th>
-                <td>{{ recipe.difficulty }}</td>
+                <td>{% if recipe.difficulty == 1 %}Facile{% elseif recipe.difficulty == 2 %}Moyen{% else %}Difficile{% endif %}</td>
             </tr>
             <tr>
                 <th>Allergènes</th>
                 <td>
-                    <ul>{% for allergen in recipe.allergens %}
+                    <ul class = "list-unstyled">{% for allergen in recipe.allergens %}
                         <li>{{allergen.Name}}</li>
                         {% else %}Pas d'allergènes{% endfor %}
                     </ul>
                 </td>
             </tr>
             <tr>
-                <th>Allergènes</th>
+                <th>Régime alimentaire</th>
                 <td>
-                    <ul>{% for diet in recipe.diets %}
+                    <ul class = "list-unstyled">{% for diet in recipe.diets %}
                         <li>{{diet.name}}</li>
                         {% else %}Pas de régime{% endfor %}
                     </ul>
@@ -68,9 +68,9 @@
             <tr>
                 <th>Ingrédients</th>
                 <td>
-                    <ul>
+                    <ul class = "list-unstyled">
                         {% for ingredient in recipe.containsIngredients %}
-                        <li>{{ingredient.ingredient.name}} : {{ingredient.quantity}} {{ingredient.ingredient.unit}}</li>
+                        <li><span class="fw-bold">{{ingredient.ingredient.name}}</span> : <span class="fst-italic">{{ingredient.quantity}} {{ingredient.ingredient.unit}}</span></li>
                         {% endfor %}
                     </ul>
                 </td>
@@ -81,7 +81,7 @@
             </tr>
             <tr>
                 <th>Note</th>
-                <td>{{ recipe.rating }}</td>
+                <td>{{ recipe.rating ?? "Non notée" }}</td>
             </tr>
         </tbody>
     </table>

@@ -72,7 +72,7 @@ class Recipe
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist", "remove"})
      * @Groups({"recipe_read"})
      */
     private $containsIngredients;
