@@ -6,6 +6,7 @@ use App\Entity\Recipe;
 use App\Form\RecipeType;
 use App\Repository\ContainsIngredientRepository;
 use App\Repository\RecipeRepository;
+use App\Services\UploadImageService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,13 +31,22 @@ class RecipeController extends AbstractController
     /**
      * @Route("/new", name="app_back_recipe_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, RecipeRepository $recipeRepository): Response
+    public function new(Request $request, RecipeRepository $recipeRepository, UploadImageService $uploadImageService): Response
     {
+
         $recipe = new Recipe();
         $form = $this->createForm(RecipeType::class, $recipe);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            if (!is_null($recipe->getPicture())) {
+
+                $recipe->setPicture("data:image/png;base64," . base64_encode($recipe->getPicture()));
+
+                $recipe = $uploadImageService->upload($recipe);
+            }
+
             $recipeRepository->add($recipe, true);
 
             return $this->redirectToRoute('app_back_recipe_index', [], Response::HTTP_SEE_OTHER);

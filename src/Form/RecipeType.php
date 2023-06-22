@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -27,7 +28,7 @@ class RecipeType extends AbstractType
         $builder
             ->add('title', TextType::class, ["label" => "Titre", "attr" => ["class" => "bg-primary"]])
             ->add('description', TextareaType::class, ["label" => "Description", "attr" => ["class" => "bg-primary"]] )
-            ->add('picture')
+            ->add('picture', FileType::class, ["label" => "Illustration", "attr" => ["class" => "bg-primary"]])
             ->add('cookingDuration', IntegerType::class, ["label" => "Temps de cuisson", "attr" => ["class" => "bg-primary"]])
             ->add('setupDuration', IntegerType::class, ["label" => "Temps de préparation", "attr" => ["class" => "bg-primary"]])
             ->add('step', TextareaType::class, ["label" => "Etapes", "attr" => ["class" => "bg-primary"]])

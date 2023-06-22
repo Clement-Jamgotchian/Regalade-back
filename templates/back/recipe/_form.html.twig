@@ -14,7 +14,7 @@
     <ul class="tags" data-prototype="{{ form_widget(form.containsIngredients.vars.prototype)|e }}">
     <h2 class="text-primary fw-bold">Ingrédients</h2>
             {% for contains in form.containsIngredients %}
-            <li>{{form_row(contains.quantity)}}{{ form_row(contains.ingredient) }}</li>
+            <div class="d-flex mb-3">{{form_widget(contains.quantity)}}{{ form_widget(contains.ingredient) }}</div>
         {% endfor %}
             <button type="button" class="btn btn-info add_item_link" data-collection-holder-class="tags">Ajouter un ingrédient</button>
     </ul>
@@ -28,7 +28,8 @@
   const addFormToCollection = (e) => {
   const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
 
-  const item = document.createElement('li');
+  const item = document.createElement('div');
+  item.classList.add("d-flex", "mb-3");
 
   item.innerHTML = collectionHolder
     .dataset
@@ -48,7 +49,7 @@
 const addTagFormDeleteLink = (item) => {
     const removeFormButton = document.createElement('button');
     removeFormButton.innerText = 'Supprimer cet ingrédient';
-    removeFormButton.classList.add("btn", "btn-primary");
+    removeFormButton.classList.add("btn", "btn-primary", "col-3");
 
     item.append(removeFormButton);
 
@@ -66,7 +67,7 @@ document
   });
 
   document
-    .querySelectorAll('ul.tags li')
+    .querySelectorAll('ul.tags div')
     .forEach((tag) => {
         addTagFormDeleteLink(tag)
     })

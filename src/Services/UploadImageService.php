@@ -24,7 +24,7 @@ class UploadImageService
         $format = trim(str_replace('data:image/', '', $base64[0]), ';');
 
         $stringToConvert = base64_decode($base64[1]);
-
+        
         $file = "images/" . $folder . uniqid() . '.' . $format;
 
         file_put_contents($file, $stringToConvert);
