@@ -27,9 +27,13 @@ class AllergenDietService
         $allergenRecipes = [];
         if(!is_null($this->request->query->get('allergen')))
         {
+
             /** @var array */
             $allergens = $this->request->query->get('allergen');
             foreach ($allergens as $allergenId) {
+                if ($this->allergenRepository->find($allergenId) === null) {
+                    return false;
+                }
                 $concernAllergen = $this->allergenRepository->find($allergenId);
                 $associatedRecipes = $concernAllergen->getRecipe();
 
@@ -48,9 +52,13 @@ class AllergenDietService
         $noDietRecipes = [];
         if(!is_null($this->request->query->get('diet')))
         {
+
             /** @var array */
             $diets = $this->request->query->get('diet');
             foreach ($diets as $dietId) {
+                if ($this->dietRepository->find($dietId) === null) {
+                    return false;
+                }
                 $concernDiet = $this->dietRepository->find($dietId);
 
                 foreach($this->recipeRepository->findAll() as $recipe)
