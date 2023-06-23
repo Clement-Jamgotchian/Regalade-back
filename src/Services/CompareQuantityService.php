@@ -103,7 +103,7 @@ class CompareQuantityService
 
         if ($quantityToSet > 0) {
 
-            $cart = $this->cartRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $this->user) ?? new Cart();
+            $cart = $this->cartRepository->findOneBy(["ingredient" => $containsIngredientElement->getIngredient(), "user" => $this->user]) ?? new Cart();
 
             $cart->setIngredient($containsIngredientElement->getIngredient())
                  ->setUser($this->user)

@@ -44,7 +44,7 @@ class FridgeController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $ingredientToRead = $fridgeRepository->findOneByIngredient($ingredient, $user);
+        $ingredientToRead = $fridgeRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
 
         if ($ingredient === null) {
             return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_NOT_FOUND, []);

@@ -39,19 +39,6 @@ class CommentRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-    * @return Comment[] Returns an array of Comment objects
-    */
-   public function findByRecipe($recipe): array
-   {
-       return $this->createQueryBuilder('c')
-           ->andWhere('c.recipe = :recipe')
-           ->setParameter('recipe', $recipe)
-           ->getQuery()
-           ->getResult()
-       ;
-   }
-
    public function findNoValidate(): array
    {
       return $this->createQueryBuilder('c')
