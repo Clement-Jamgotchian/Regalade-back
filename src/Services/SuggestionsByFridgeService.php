@@ -46,7 +46,7 @@ class SuggestionsByFridgeService
 
         foreach ($this->recipeRepository->findAll() as $recipe) {
 
-            if ($this->recipeListRepository->findOneByRecipe($recipe, $this->user)) {
+            if ($this->recipeListRepository->findOneBy(["recipe" => $recipe, "user" => $this->user])) {
                 continue;
             }
 

@@ -10,6 +10,5 @@ class RecipeNamer implements NamerInterface
     public function name($obj,PropertyMapping $field):string
     {
         return "images/recipe-picture/" . uniqid().".".$obj->getPictureFile()->guessExtension();
-
     }
 }
