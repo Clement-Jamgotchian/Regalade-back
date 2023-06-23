@@ -15,7 +15,7 @@ class UpdateRatingService
 
     public function update($repository, $recipe, $newRating) {
 
-        $comments = $repository->findByRecipe($recipe);
+        $comments = $repository->findBy(["recipe" => $recipe]);
 
         $rating = [];
         foreach ($comments as $comment) {

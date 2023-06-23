@@ -39,19 +39,6 @@ class CartRepository extends ServiceEntityRepository
         }
     }
 
-    public function findOneByIngredient($ingredient, $user): ?Cart
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.ingredient = :ingredient')
-            ->andWhere('c.user = :user')
-            ->setParameter('user', $user)
-            ->setParameter('ingredient', $ingredient)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-
-
 //    /**
 //     * @return Cart[] Returns an array of Cart objects
 //     */

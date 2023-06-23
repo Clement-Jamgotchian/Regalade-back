@@ -94,7 +94,7 @@ class RecipeController extends AbstractController
      */
     public function browseForHome(Request $request, RecipeRepository $recipeRepository, CategoryRepository $categoryRepository): JsonResponse
     {
-        if ($categoryRepository->find($request->query->get('category')) === null) {
+        if ($request->query->get('category') !== "new" && $categoryRepository->find($request->query->get('category')) === null) {
             return $this->json(['message' => "Cette catégorie n'existe pas"], Response::HTTP_BAD_REQUEST, []);
         }
 
@@ -146,12 +146,13 @@ class RecipeController extends AbstractController
         if (!$user->getRecipes()->contains($recipe)) {
 
             $editedRecipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
-            $editedRecipe->setMotherRecipe($recipe);
-            $editedRecipe->setIsValidate(false);
+            $editedRecipe->setMotherRecipe($recipe)
+                         ->setIsValidate(false);
+
             $recipeRepository->add($editedRecipe, true);
 
         } else {
-            $ingredients = $containsIngredientRepository->findByRecipe($recipe);
+            $ingredients = $containsIngredientRepository->findBy(["recipe" => $recipe]);
             foreach ($ingredients as $ingredient) {
                 $containsIngredientRepository->remove($ingredient, true);
             }
@@ -167,12 +168,6 @@ class RecipeController extends AbstractController
      */
     public function delete(?Recipe $recipe, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
     {
-        $ingredientsInRecipe = $containsIngredientRepository->findByRecipe($recipe);
-
-        foreach ($ingredientsInRecipe as $ingredient) {
-            $containsIngredientRepository->remove($ingredient, true);
-        }
-        
         $deletedRecipe = $addEditDeleteService->delete($recipe, $recipeRepository, Recipe::class);
 
         return $this->json(["message" => $deletedRecipe[0]], $deletedRecipe[1]);
@@ -201,6 +196,5 @@ class RecipeController extends AbstractController
 
         return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
     }
-
 
 }

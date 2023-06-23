@@ -34,7 +34,6 @@ class AddEditDeleteService
 
     public function add($repository, $entityClass, $newUser = null)
     {
-
         $newAdd = $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json');
 
         if ($entityClass === Comment::class) {
