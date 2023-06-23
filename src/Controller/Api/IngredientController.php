@@ -21,12 +21,9 @@ class IngredientController extends AbstractController
      */
     public function browse(Request $request, IngredientRepository $ingredientRepository): JsonResponse
     {
-        if(!is_null($request->query->get('search'))) {
-            $ingredients = $ingredientRepository->findWhere($request->query->get('search'));
-        } else {
-            $ingredients = $ingredientRepository->findAll();
-        }
-
+        $ingredients = (!is_null($request->query->get('search'))) ? $ingredientRepository->findWhere($request->query->get('search'))
+                                                                  : $ingredientRepository->findAll();
+        
         if (empty($ingredients)) {
             return $this->json('', Response::HTTP_NO_CONTENT, []);
         }
@@ -47,14 +44,14 @@ class IngredientController extends AbstractController
     }
 
     /**
-    * @Route("", name="add", requirements={"id"="\d+"}, methods={"POST"})
+    * @Route("", name="add", methods={"POST"})
     */
 
     public function add(AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
     {
-         $addEditDeleteService->add($ingredientRepository, Ingredient::class);
+         $newIngredient = $addEditDeleteService->add($ingredientRepository, Ingredient::class);
  
-         return $this->json(["message" => "Ingrédient ajouté à la liste des ingrédients"], Response::HTTP_OK);
+         return $this->json($newIngredient, Response::HTTP_CREATED, [], ['groups' => ["ingredient_browse", "ingredient_read"]]);
     }
 
     /**
@@ -62,9 +59,9 @@ class IngredientController extends AbstractController
     */
     public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, IngredientRepository $ingredientRepository): JsonResponse
     {
-         $addEditDeleteService->edit($ingredient, $ingredientRepository, Ingredient::class);
+         $editedIngredient = $addEditDeleteService->edit($ingredient, $ingredientRepository, Ingredient::class);
  
-         return $this->json(["message" => "Ingrédient édité"], Response::HTTP_OK);
+         return $this->json($editedIngredient, Response::HTTP_OK, [], ['groups' => ["ingredient_browse", "ingredient_read"]]);
     }
 
 }
