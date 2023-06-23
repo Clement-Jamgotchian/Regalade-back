@@ -70,7 +70,7 @@ class RecipeRepository extends ServiceEntityRepository
            ->andWhere('r.motherRecipe IS null')
            ->setParameter('category', $category)
            ->orderBy('r.rating', 'DESC')
-           ->setMaxResults(5)
+           ->setMaxResults(4)
            ->getQuery()
            ->getResult()
        ;
@@ -81,7 +81,7 @@ class RecipeRepository extends ServiceEntityRepository
        return $this->createQueryBuilder('r')
            ->andWhere('r.motherRecipe IS null')
            ->orderBy('r.createdAt', 'DESC')
-           ->setMaxResults(5)
+           ->setMaxResults(4)
            ->getQuery()
            ->getResult()
        ;
