@@ -27,11 +27,17 @@ class RecipeController extends AbstractController
      */
     public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface, AllergenDietService $allergenDietService): JsonResponse
     {
-        
-        if(!is_null($request->query->get('search'))) {
-            $recipes = $recipeRepository->findWhere($request->query->get('search'));
-        } else {
-            $recipes = $recipeRepository->findMotherRecipes();
+        $recipes = (!is_null($request->query->get('search'))) ? $recipeRepository->findWhere($request->query->get('search')) 
+                                                              : $recipeRepository->findBy(['motherRecipe' => null], ['createdAt' => 'DESC']);
+
+        if(!is_null($request->query->get('category'))) {
+            $recipesWithCategory = $recipeRepository->findBy(['category' => $request->query->get('category'), 'motherRecipe' => null], ['rating' => 'DESC']);
+
+            foreach ($recipes as $key => $recipe) {
+                if (!in_array($recipe, $recipesWithCategory)) {
+                    unset($recipes[$key]);
+                }
+            }
         }
 
         $allergenRecipes = $allergenDietService->hideRecipesWithAllergen();
@@ -74,11 +80,8 @@ class RecipeController extends AbstractController
      */
     public function browseForHome(Request $request, RecipeRepository $recipeRepository): JsonResponse
     {
-        if ($request->query->get('category') === "new") {
-            $recipes = $recipeRepository->findNew();
-        } else {
-            $recipes = $recipeRepository->findTop($request->query->get('category'));
-        }
+        $recipes = ($request->query->get('category') === "new") ? $recipeRepository->findBy(['motherRecipe' => null], ['createdAt' => 'DESC'], 4) 
+                                                                : $recipeRepository->findBy(['category' => $request->query->get('category'), 'motherRecipe' => null], ['rating' => 'DESC'], 4);
 
         if(empty($recipes)) {
             return $this->json('', Response::HTTP_NO_CONTENT, []);

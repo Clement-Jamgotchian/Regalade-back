@@ -18,12 +18,14 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"category_browse"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"recipe_browse"})
+     * @Groups({"category_browse"})
      */
     private $title;
 
