@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Recipe;
 use App\Repository\AllergenRepository;
+use App\Repository\CategoryRepository;
 use App\Repository\ContainsIngredientRepository;
 use App\Repository\DietRepository;
 use App\Repository\RecipeRepository;
@@ -25,12 +26,17 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface, AllergenDietService $allergenDietService): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface, AllergenDietService $allergenDietService, CategoryRepository $categoryRepository): JsonResponse
     {
         $recipes = (!is_null($request->query->get('search'))) ? $recipeRepository->findWhere($request->query->get('search')) 
                                                               : $recipeRepository->findBy(['motherRecipe' => null], ['createdAt' => 'DESC']);
 
         if(!is_null($request->query->get('category'))) {
+
+            if ($categoryRepository->find($request->query->get('category')) === null) {
+                return $this->json(['message' => "Cette catégorie n'existe pas"], Response::HTTP_BAD_REQUEST, []);
+            }
+
             $recipesWithCategory = $recipeRepository->findBy(['category' => $request->query->get('category'), 'motherRecipe' => null], ['rating' => 'DESC']);
 
             foreach ($recipes as $key => $recipe) {
@@ -41,7 +47,12 @@ class RecipeController extends AbstractController
         }
 
         $allergenRecipes = $allergenDietService->hideRecipesWithAllergen();
+
+        if($allergenRecipes === false) {
+            return $this->json(['message' => "Cet allergène n'existe pas"], Response::HTTP_BAD_REQUEST, []);
+        }
         if (!empty($allergenRecipes)) {
+
             foreach ($recipes as $key => $recipe) {
                 if (in_array($recipe, $allergenRecipes)) {
                     unset($recipes[$key]);
@@ -50,6 +61,9 @@ class RecipeController extends AbstractController
         }
 
         $noDietRecipes = $allergenDietService->hideRecipesWithoutDiet();
+        if($noDietRecipes === false) {
+            return $this->json(['message' => "Ce régime alimentaire n'existe pas"], Response::HTTP_BAD_REQUEST, []);
+        }
         if (!empty($noDietRecipes)) {
             foreach ($recipes as $key => $recipe) {
                 if (in_array($recipe, $noDietRecipes)) {
@@ -78,8 +92,12 @@ class RecipeController extends AbstractController
     /**
      * @Route("/home", name="browseForHome", methods={"GET"})
      */
-    public function browseForHome(Request $request, RecipeRepository $recipeRepository): JsonResponse
+    public function browseForHome(Request $request, RecipeRepository $recipeRepository, CategoryRepository $categoryRepository): JsonResponse
     {
+        if ($categoryRepository->find($request->query->get('category')) === null) {
+            return $this->json(['message' => "Cette catégorie n'existe pas"], Response::HTTP_BAD_REQUEST, []);
+        }
+
         $recipes = ($request->query->get('category') === "new") ? $recipeRepository->findBy(['motherRecipe' => null], ['createdAt' => 'DESC'], 4) 
                                                                 : $recipeRepository->findBy(['category' => $request->query->get('category'), 'motherRecipe' => null], ['rating' => 'DESC'], 4);
 
