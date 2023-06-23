@@ -39,15 +39,6 @@ class CommentRepository extends ServiceEntityRepository
         }
     }
 
-   public function findNoValidate(): array
-   {
-      return $this->createQueryBuilder('c')
-          ->andWhere('c.isValidate IS null OR c.isValidate = 0')
-          ->orderBy('c.createdAt', 'ASC')
-           ->getQuery()
-          ->getResult()
-      ;
-   }
 
 //    /**
 //     * @return Comment[] Returns an array of Comment objects
