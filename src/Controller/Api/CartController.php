@@ -10,6 +10,7 @@ use App\Services\AddEditDeleteService;
 use App\Services\CompareQuantityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -64,12 +65,21 @@ class CartController extends AbstractController
      * @Route("/add", name="addOne", methods={"POST"})
      * 
      */
-    public function addOne(AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
+    public function addOne(Request $request, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
 
-        $newCart = $addEditDeleteService->add($cartRepository, Cart::class);
+        $cartExist = $cartRepository->findOneByIngredient($request->toArray()["ingredient"], $this->getUser());
+        $quantity = $request->toArray()["quantity"];
 
-        return $this->json($newCart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
+        if ($cartExist) {
+            $cart = $cartExist;
+            $cart->setQuantity(round($quantity + $cart->getQuantity()));
+            $cartRepository->add($cart, true);
+        } else {
+            $cart = $addEditDeleteService->add($cartRepository, Cart::class);
+        }
+
+        return $this->json($cart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
     }
 
     /**
@@ -128,5 +138,18 @@ class CartController extends AbstractController
 
         return $this->json($cart, 200, [], ['groups' => ["ingredient_read", "cart_browse"]]);
 
+    }
+
+    /**
+     * @Route("/to-fridge", name="transfer", methods={"POST"})
+     */
+    public function transfer(CompareQuantityService $compareQuantityService): JsonResponse
+    {
+        /** @var User */
+        $user = $this->getUser();
+
+        $transfer = $compareQuantityService->addToFridgeAfterCart($user->getCarts());
+
+        return $this->json(['message' => $transfer[0]], $transfer[1], []);
     }
 }

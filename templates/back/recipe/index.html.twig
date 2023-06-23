@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recettes en attente de validation{% endblock %}
+
+{% block body %}
+    <h1 class="text-primary fw-bold">Recettes en attente de validation</h1>
+
+    <table class="table table-primary table-striped-columns text-center align-middle">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Auteur</th>
+                <th>Date</th>
+                <th>Titre</th>
+                <th>actions</th>
+                <th>validation</th>
+                <th>suppression</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for recipe in recipes %}
+            <tr>
+                <td>{% if recipe.picture is not null %}<img src="{{ asset(recipe.picture) }}" class="img-thumbnail" style="width: 18rem;">{% else %} Pas d'image{% endif %}</td>
+                <td>{{ recipe.user.nickname ?? '/' }}</td>
+                <td>{{ recipe.createdAt ? recipe.createdAt|date('d-m-Y H:i:s') : '/' }}</td>
+                <td>{{ recipe.title }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{{ path('app_back_recipe_show', {'id': recipe.id}) }}">Voir</a>
+                    <a class="btn btn-warning" href="{{ path('app_back_recipe_edit', {'id': recipe.id}) }}">Editer</a>
+                </td>
+                <td><a class="btn btn-success" href="{{ path('app_back_recipe_validate', {'id': recipe.id}) }}">Valider</a></td>
+                <td> {{ include('back/recipe/_delete_form.html.twig') }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">Aucune recette à valider pour le moment</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-secondary" href="{{ path('app_back_recipe_new') }}">Créer une nouvelle recette</a>
+{% endblock %}

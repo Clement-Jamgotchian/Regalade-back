@@ -45,6 +45,7 @@ class RecipeRepository extends ServiceEntityRepository
     {
        return $this->createQueryBuilder('r')
            ->andWhere('r.title LIKE :title')
+           ->andWhere('r.motherRecipe IS null')
            ->setParameter('title', '%'. $title .'%')
            ->orderBy('r.rating', 'DESC')
            ->getQuery()
@@ -52,6 +53,63 @@ class RecipeRepository extends ServiceEntityRepository
        ;
     }
 
+    public function findMotherRecipes(): array
+    {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.motherRecipe IS null')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
+    public function findTop($category): array
+    {
+       return $this->createQueryBuilder('r')
+           ->innerJoin('r.category', 'c')
+           ->andWhere('c.title = :category')
+           ->andWhere('r.motherRecipe IS null')
+           ->setParameter('category', $category)
+           ->orderBy('r.rating', 'DESC')
+           ->setMaxResults(5)
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
+    public function findNew(): array
+    {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.motherRecipe IS null')
+           ->orderBy('r.createdAt', 'DESC')
+           ->setMaxResults(5)
+           ->getQuery()
+           ->getResult()
+       ;
+    }
+
+
+    public function findNoValidate(): array
+    {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.isValidate IS null OR r.isValidate = 0')
+           ->orderBy('r.createdAt', 'ASC')
+            ->getQuery()
+           ->getResult()
+       ;
+    }
+
+    public function findAllergen($allergen): array
+    {
+       return $this->createQueryBuilder('r')
+           ->innerJoin('r.allergen', 'a')
+           ->andWhere('a.name != :allergen')
+           ->andWhere('r.motherRecipe IS null')
+           ->setParameter('allergen', $allergen)
+           ->orderBy('r.rating', 'DESC')
+           ->getQuery()
+           ->getResult()
+       ;
+    }
 
 
 //    /**

@@ -3,9 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\Recipe;
+use App\Repository\AllergenRepository;
 use App\Repository\ContainsIngredientRepository;
+use App\Repository\DietRepository;
 use App\Repository\RecipeRepository;
 use App\Services\AddEditDeleteService;
+use App\Services\AllergenDietService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,12 +25,31 @@ class RecipeController extends AbstractController
     /**
      * @Route("", name="browse", methods={"GET"})
      */
-    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface): JsonResponse
+    public function browse(Request $request, RecipeRepository $recipeRepository, PaginatorInterface $paginatorInterface, AllergenDietService $allergenDietService): JsonResponse
     {
+        
         if(!is_null($request->query->get('search'))) {
             $recipes = $recipeRepository->findWhere($request->query->get('search'));
         } else {
-            $recipes = $recipeRepository->findAll();
+            $recipes = $recipeRepository->findMotherRecipes();
+        }
+
+        $allergenRecipes = $allergenDietService->hideRecipesWithAllergen();
+        if (!empty($allergenRecipes)) {
+            foreach ($recipes as $key => $recipe) {
+                if (in_array($recipe, $allergenRecipes)) {
+                    unset($recipes[$key]);
+                }
+            }
+        }
+
+        $noDietRecipes = $allergenDietService->hideRecipesWithoutDiet();
+        if (!empty($noDietRecipes)) {
+            foreach ($recipes as $key => $recipe) {
+                if (in_array($recipe, $noDietRecipes)) {
+                    unset($recipes[$key]);
+                }
+            }
         }
 
         $recipesWithPagination = $paginatorInterface->paginate(
@@ -46,6 +68,24 @@ class RecipeController extends AbstractController
 
         return $this->json($toSend, 200, [], ['groups' => ["recipe_browse"]]);
     }
+
+    /**
+     * @Route("/home", name="browseForHome", methods={"GET"})
+     */
+    public function browseForHome(Request $request, RecipeRepository $recipeRepository): JsonResponse
+    {
+        if ($request->query->get('category') === "new") {
+            $recipes = $recipeRepository->findNew();
+        } else {
+            $recipes = $recipeRepository->findTop($request->query->get('category'));
+        }
+
+        if(empty($recipes)) {
+            return $this->json('', Response::HTTP_NO_CONTENT, []);
+        }
+
+        return $this->json($recipes, 200, [], ['groups' => ["recipe_browse"]]);
+    }
     
     /**
      * @Route("/{id}", name="read", requirements={"id"="\d+"}, methods={"GET"})
@@ -57,7 +97,7 @@ class RecipeController extends AbstractController
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
         
-        return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
+        return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read", "recipe_duplicate"]]);
     }
 
     /**
@@ -73,7 +113,7 @@ class RecipeController extends AbstractController
     /**
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      */
-    public function edit(?Recipe $recipe, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository): JsonResponse
+    public function edit(?Recipe $recipe, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
     {
         /** @var User */
         $user = $this->getUser();
@@ -85,9 +125,16 @@ class RecipeController extends AbstractController
         if (!$user->getRecipes()->contains($recipe)) {
 
             $editedRecipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
+            $editedRecipe->setMotherRecipe($recipe);
+            $editedRecipe->setIsValidate(false);
+            $recipeRepository->add($editedRecipe, true);
 
         } else {
-
+            $ingredients = $containsIngredientRepository->findByRecipe($recipe);
+            foreach ($ingredients as $ingredient) {
+                $containsIngredientRepository->remove($ingredient, true);
+            }
+            
             $editedRecipe = $addEditDeleteService->edit($recipe, $recipeRepository, Recipe::class);
         }
         

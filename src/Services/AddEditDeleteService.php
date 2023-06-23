@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Comment;
 use App\Entity\Ingredient;
+use App\Entity\Recipe;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,15 +19,17 @@ class AddEditDeleteService
     private $entityManagerInterface;
     private $user;
     private $updateRatingService;
+    private $uploadImageService;
 
     public function __construct(RequestStack $request, SerializerInterface $serializerInterface, EntityManagerInterface $entityManagerInterface, Security $security, UpdateRatingService
-     $updateRatingService)
+     $updateRatingService, UploadImageService $uploadImageService)
     {
         $this->request = $request->getCurrentRequest();
         $this->serializerInterface = $serializerInterface;
         $this->entityManagerInterface = $entityManagerInterface;
         $this->user = $security->getUser();
         $this->updateRatingService = $updateRatingService;
+        $this->uploadImageService = $uploadImageService;
     }
 
     public function add($repository, $entityClass, $newUser = null)
@@ -49,6 +52,8 @@ class AddEditDeleteService
         if(method_exists($newAdd, 'isIsAdult') && $newAdd->isIsAdult() === null) {
             $newAdd->setIsAdult(true);
         }
+
+        $this->uploadImageService->upload($newAdd);
 
         $repository->add($newAdd, true);
 
@@ -77,6 +82,12 @@ class AddEditDeleteService
     {
 
         $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $entity]);
+
+        $this->uploadImageService->upload($entity);
+
+        if($entityClass === Recipe::class) {
+            $entity->setIsValidate(false);
+        }
 
         $repository->add($entity, true);
 
