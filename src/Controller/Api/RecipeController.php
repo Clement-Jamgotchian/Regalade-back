@@ -94,7 +94,7 @@ class RecipeController extends AbstractController
      */
     public function browseForHome(Request $request, RecipeRepository $recipeRepository, CategoryRepository $categoryRepository): JsonResponse
     {
-        if ($categoryRepository->find($request->query->get('category')) === null) {
+        if ($request->query->get('category') !== "new" && $categoryRepository->find($request->query->get('category')) === null) {
             return $this->json(['message' => "Cette catégorie n'existe pas"], Response::HTTP_BAD_REQUEST, []);
         }
 
