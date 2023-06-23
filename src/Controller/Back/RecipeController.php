@@ -15,23 +15,23 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @Route("/back/recipe")
+ * @Route("/back/recipe",name="app_back_recipe_")
  * @IsGranted("ROLE_ADMIN")
  */
 class RecipeController extends AbstractController
 {
     /**
-     * @Route("/", name="app_back_recipe_index", methods={"GET"})
+     * @Route("/", name="index", methods={"GET"})
      */
     public function index(RecipeRepository $recipeRepository): Response
     {
         return $this->render('back/recipe/index.html.twig', [
-            'recipes' => $recipeRepository->findNoValidate(),
+            'recipes' => $recipeRepository->findBy(['isValidate' => null]),
         ]);
     }
 
     /**
-     * @Route("/new", name="app_back_recipe_new", methods={"GET", "POST"})
+     * @Route("/new", name="new", methods={"GET", "POST"})
      */
     public function new(Request $request, RecipeRepository $recipeRepository, UploadImageService $uploadImageService): Response
     {
@@ -61,7 +61,7 @@ class RecipeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="app_back_recipe_show", methods={"GET"})
+     * @Route("/{id}", name="show", methods={"GET"})
      */
     public function show(Recipe $recipe): Response
     {
@@ -71,7 +71,7 @@ class RecipeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="app_back_recipe_edit", methods={"GET", "POST"})
+     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
     public function edit(Request $request, Recipe $recipe, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): Response
     {
@@ -106,7 +106,7 @@ class RecipeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="app_back_recipe_delete", methods={"POST"})
+     * @Route("/{id}", name="delete", methods={"POST"})
      */
     public function delete(Request $request, Recipe $recipe, RecipeRepository $recipeRepository): Response
     {
@@ -118,7 +118,7 @@ class RecipeController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/validate", name="app_back_recipe_validate", methods={"GET"})
+     * @Route("/{id}/validate", name="validate", methods={"GET"})
      */
     public function validate(Recipe $recipe, RecipeRepository $recipeRepository): Response
     {
