@@ -13,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Regex;
 
 class UserType extends AbstractType
 {
@@ -28,8 +27,11 @@ class UserType extends AbstractType
                 $user = $event->getData();
 
                 if ($user->getId() === null) {
-                    $builder->add('password', null, [
-                        'empty_data' => '',
+                    $builder->add('password',PasswordType::class, [
+                        "label" => "Password",
+                        "attr" => [
+                            "class" => "bg-primary",
+                            "placeholder" => "Password"],
                         'constraints' => [
                             new NotBlank(),
                         ],
