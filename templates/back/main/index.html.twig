@@ -34,7 +34,10 @@
 
         </div>
         <div class="card-footer text-body-secondary">
+            {% if lastCommentTime == null %} rien pour <br> le moment
+            {% else %}
             {{ lastCommentTime }} depuis le dernier commentaire.
+            {% endif %}
         </div>
     </div>
 
@@ -52,7 +55,10 @@
             <a href="{{ path('app_back_recipe_new') }}" class="mt-3 btn btn-info">Créer une nouvelle recette</a>
         </div>
         <div class="card-footer text-body-secondary">
+            {% if lastRecipeTime == null %} rien pour <br> le moment
+            {% else %}
             {{ lastRecipeTime }} depuis la dernière création de recette.
+            {% endif %}
         </div>
     </div>
 
