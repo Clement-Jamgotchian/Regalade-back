@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{diet.name}}{% endblock %}
+
+{% block body %}
+    <h1 class="text-primary fw-bold">{{diet.name}}</h1>
+
+    <table class="table table-primary table-striped-columns text-center">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ diet.id }}</td>
+            </tr>
+            <tr>
+                <th>nom</th>
+                <td>{{ diet.name }}</td>
+            </tr>
+            <tr>
+                <th>Crée le</th>
+                <td>{{ diet.createdAt ? diet.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Modifié le</th>
+                <td>{{ diet.updatedAt ? diet.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary mb-3" href="{{ path('app_back_diet_index') }}">Retour</a>
+
+    <a class="btn btn-warning mb-3" href="{{ path('app_back_diet_edit', {'id': diet.id}) }}">Editer</a>
+
+    {{ include('back/diet/_delete_form.html.twig') }}
+{% endblock %}
