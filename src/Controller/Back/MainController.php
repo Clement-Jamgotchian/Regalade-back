@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-use function PHPUnit\Framework\isNull;
-
 /**
  * @Route("/back", name="app_back_main_")
  * @IsGranted("ROLE_ADMIN")
@@ -37,20 +35,15 @@ class MainController extends AbstractController
         $departments = count($departmentRepository->findAll());
         $allergens = count($allergenRepository->findAll());
         $diets = count($dietRepository->findAll());
+        $recipes = count($recipeRepository->findAll());
+        $comments = count($commentRepository->findAll());
 
         $lastRecipe = $recipeRepository->findOneBy([], ["createdAt" => 'DESC']);
-        if (!isNull($lastRecipe)) {
-            $lastRecipeTime = date_diff($lastRecipe->getCreatedAt(), new DateTime('now'))->format('%d jour(s) - %H heure(s) - %I minute(s)');
-        } else {
-            $lastRecipeTime = null;
-        };
+        $lastRecipeTime = is_null($lastRecipe) ? null : date_diff($lastRecipe->getCreatedAt(), new DateTime('now'))->format('%d jour(s) - %H heure(s) - %I minute(s)');
 
         $lastComment = $commentRepository->findOneBy([], ["createdAt" => 'DESC']);
-        if (!isNull($lastComment)) {
-            $lastCommentTime = date_diff($lastComment->getCreatedAt(), new DateTime('now'))->format('%d jour(s) - %H heure(s) - %I minute(s)');
-        }else{
-            $lastCommentTime = null;
-        };
+        $lastCommentTime = is_null($lastComment) ? null : date_diff($lastComment->getCreatedAt(), new DateTime('now'))->format('%d jour(s) - %H heure(s) - %I minute(s)');
+
         $lastUser = $userRepository->findOneBy([],["createdAt" => 'DESC']);
         $lastUserTime = date_diff($lastUser->getCreatedAt(), new DateTime('now'))->format('%d jour(s) - %H heure(s) - %I minute(s)');
 
@@ -65,7 +58,9 @@ class MainController extends AbstractController
             'categories' => $categories,
             'departments' => $departments,
             'allergens' => $allergens,
-            'diets' => $diets
+            'diets' => $diets,
+            'recipes' => $recipes,
+            'comments' => $comments
         ]);
     }
 }
