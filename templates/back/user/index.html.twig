@@ -10,9 +10,9 @@
             <tr>
                 <th>Id</th>
                 <th>Email</th>
-                <th>Roles</th>
-                <th>Nickname</th>
-                <th>Action</th>
+                <th>Role</th>
+                <th>Pseudo</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -20,7 +20,7 @@
             <tr>
                 <td>{{ user.id }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                <td> {% if "ROLE_ADMIN" in user.roles %} Admin {% else %} Utilisateur {% endif %}</td>
                 <td>{{ user.nickname }}</td>
                 <td>
                     <a class="btn btn-primary" href="{{ path('app_back_user_show', {'id': user.id}) }}">Voir</a>
