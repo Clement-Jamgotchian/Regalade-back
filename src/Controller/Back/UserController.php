@@ -2,6 +2,7 @@
 
 namespace App\Controller\Back;
 
+use App\Controller\Api\MemberController;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;

@@ -43,8 +43,7 @@ class UserType extends AbstractType
                 "multiple" => true,
                 "expanded" => true,
                 "choices" => [
-                    "ADMIN" => "ROLE_ADMIN",
-                    "USER" => "ROLE_USER",
+                    "ADMIN" => "ROLE_ADMIN"
                 ], "label" => "Roles", "attr" => ["class" => "bg-primary"]
             ])
         ;
