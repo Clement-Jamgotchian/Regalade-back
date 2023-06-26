@@ -58,7 +58,7 @@ class ListController extends AbstractController
 
         /** @var User */
         $user = $this->getUser();
-        $addRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
+        $addRecipe = $recipeListRepository->findOneBy(["recipe" => $recipe, "user" => $user]);
 
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
@@ -69,9 +69,9 @@ class ListController extends AbstractController
         }
 
         $newRecipeList = new RecipeList();
-        $newRecipeList->setRecipe($recipe);
-        $newRecipeList->setUser($user);
-        $newRecipeList->setPortions(count($user->getMembers()));
+        $newRecipeList->setRecipe($recipe)
+                      ->setUser($user)
+                      ->setPortions(count($user->getMembers()));
 
         $recipeListRepository->add($newRecipeList, true);
 
@@ -90,14 +90,14 @@ class ListController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $rmRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
+        $recipeListElementToRemove = $recipeListRepository->findOneBy(["recipe" => $recipe, "user" => $user]);
       
         if ($recipe === null) {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
         
-        if ($rmRecipe) {
-            $recipeListRepository->remove($rmRecipe, true);
+        if ($recipeListElementToRemove) {
+            $recipeListRepository->remove($recipeListElementToRemove, true);
                 return $this->json(["message" => "Recette supprimée de la liste de repas"], Response::HTTP_OK);
         }
         else
@@ -119,7 +119,7 @@ class ListController extends AbstractController
         return $this->json(["message" => "Toutes les recettes ont été supprimée de la liste des repas"], Response::HTTP_OK);
     }
 
-       /**
+    /**
      * éditer un repas de la liste
      *
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
@@ -130,7 +130,7 @@ class ListController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $editRecipe = $recipeListRepository->findOneByRecipe($recipe, $user);
+        $editRecipe = $recipeListRepository->findOneBy(["recipe" => $recipe, "user" => $user]);
 
         $editedRecipe = $addEditDeleteService->edit($editRecipe, $recipeListRepository, RecipeList::class);
 

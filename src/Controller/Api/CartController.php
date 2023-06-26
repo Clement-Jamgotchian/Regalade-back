@@ -67,8 +67,7 @@ class CartController extends AbstractController
      */
     public function addOne(Request $request, AddEditDeleteService $addEditDeleteService, CartRepository $cartRepository): JsonResponse
     {
-
-        $cartExist = $cartRepository->findOneByIngredient($request->toArray()["ingredient"], $this->getUser());
+        $cartExist = $cartRepository->findOneBy(["ingredient" => $request->toArray()["ingredient"], "user" => $this->getUser()]);
         $quantity = $request->toArray()["quantity"];
 
         if ($cartExist) {
@@ -91,7 +90,7 @@ class CartController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $cart = $cartRepository->findOneByIngredient($ingredient, $user);
+        $cart = $cartRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
 
         $deletedCart = $addEditDeleteService->delete($cart, $cartRepository, Cart::class);
 
@@ -108,7 +107,7 @@ class CartController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $cart = $cartRepository->findOneByIngredient($ingredient, $user);
+        $cart = $cartRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
 
         $EditedCart = $addEditDeleteService->edit($cart, $cartRepository, Cart::class);
 
@@ -125,7 +124,7 @@ class CartController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $cart = $cartRepository->findOneByIngredient($ingredient, $user);
+        $cart = $cartRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
 
         if ($ingredient === null)
         {

@@ -7,6 +7,7 @@ use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Entity\User;
 use App\Repository\FridgeRepository;
+use App\Repository\IngredientRepository;
 use App\Repository\RecipeListRepository;
 use App\Services\AddEditDeleteService;
 use App\Services\CompareQuantityService;
@@ -43,7 +44,7 @@ class FridgeController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $ingredientToRead = $fridgeRepository->findOneByIngredient($ingredient, $user);
+        $ingredientToRead = $fridgeRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
 
         if ($ingredient === null) {
             return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_NOT_FOUND, []);
@@ -62,7 +63,6 @@ class FridgeController extends AbstractController
     public function add(FridgeRepository $fridgeRepository, AddEditDeleteService $addEditDeleteService): JsonResponse
     {
         $fridge = $addEditDeleteService->add($fridgeRepository, Fridge::class);
-
 
         return $this->json($fridge, Response::HTTP_CREATED, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
     }
@@ -85,27 +85,33 @@ class FridgeController extends AbstractController
         /** @var User */
         $user = $this->getUser();
 
-        $fridge = $fridgeRepository->findOneByIngredient($ingredient, $user);
+        $fridge = $fridgeRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
 
-        $addEditDeleteService->delete($fridge, $fridgeRepository, Fridge::class);
+        $deletedFridge = $addEditDeleteService->delete($fridge, $fridgeRepository, Fridge::class);
 
-        return $this->json(["message" => "l'ingrédient a été supprimé du frigo"], Response::HTTP_OK);
+        return $this->json(["message" => $deletedFridge[0]], $deletedFridge[1]);
     }
     
     /**
     * @Route("/{id}", name="edit",requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
     */
-    public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, FridgeRepository $fridgeRepository): JsonResponse
+    public function edit(?Ingredient $ingredient, AddEditDeleteService $addEditDeleteService, FridgeRepository $fridgeRepository, IngredientRepository $ingredientRepository): JsonResponse
     {
         /** @var User */
         $user = $this->getUser();
  
-        $fridge = $fridgeRepository->findOneByIngredient($ingredient, $user);
+        $fridge = $fridgeRepository->findOneBy(["ingredient" => $ingredient, "user" => $user]);
+
+        if ($ingredient === null) {
+            return $this->json(['message' => "Cet ingrédient n'existe pas"], Response::HTTP_BAD_REQUEST, []);
+        }
+        if (!$fridge) {
+            return $this->json(['message' => "Cet ingrédient n'est pas dans le frigo de l'utilisateur"], Response::HTTP_BAD_REQUEST, []);
+        }
  
         $EditedFridge = $addEditDeleteService->edit($fridge, $fridgeRepository, Fridge::class);
  
         return $this->json($EditedFridge, 200, [], ['groups' => ["ingredient_read", "fridge_browse"]]);
- 
     }
 
     /**
@@ -123,15 +129,12 @@ class FridgeController extends AbstractController
     */
     public function clean(?Recipe $recipe, RecipeListRepository $recipeListRepository, CompareQuantityService $compareQuantityService, ListController $listController)
     {
-        /** @var User */
-        $user = $this->getUser();
-
         if ($recipe === null)
         {
             return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
         }
 
-        $recipeOnList = $recipeListRepository->findOneByRecipe($recipe, $this->getUser());
+        $recipeOnList = $recipeListRepository->findOneBy(['recipe' => $recipe, 'user' => $this->getUser()]);
 
         if (!$recipeOnList) {
             return $this->json(['message' => "Cette recette n'est dans la liste des repas"], Response::HTTP_NOT_FOUND, []);

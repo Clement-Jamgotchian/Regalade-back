@@ -8,7 +8,10 @@
 
 
     </head>
-    <body>
+    <body class=" bg-dark">
+        {% if app.request.attributes.get("_route") starts with "app_back_" %}
+        {% include 'partials/nav.html.twig' %}
+        {% endif %}
         <div class="container text-center">
         {% block body %}{% endblock %}
         </div>

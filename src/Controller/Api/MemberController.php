@@ -78,7 +78,6 @@ class MemberController extends AbstractController
         $editedMember = $this->addEditDeleteService->edit($member, $this->memberRepository, Member::class);
 
         return $this->json($editedMember, 200, [], ['groups' => ["member_browse", "member_read"]]);
-
     }
 
     /**
@@ -98,6 +97,5 @@ class MemberController extends AbstractController
         return $this->json(["message" => $deletedMember[0]], $deletedMember[1]);
 
     }
-
 
 }

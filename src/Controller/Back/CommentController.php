@@ -11,23 +11,23 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Route("/back/comment")
+ * @Route("/back/comment", name="app_back_comment_")
  * @IsGranted("ROLE_ADMIN")
  */
 class CommentController extends AbstractController
 {
     /**
-     * @Route("", name="app_back_comment_index")
+     * @Route("", name="index")
      */
     public function index(CommentRepository $commentRepository): Response
     {
         return $this->render('back/comment/index.html.twig', [
-            'comments' => $commentRepository->findNoValidate()
+            'comments' => $commentRepository->findBy(['isValidate' => null])
         ]);
     }
 
     /**
-     * @Route("/{id}", name="app_back_comment_show", methods={"GET"})
+     * @Route("/{id}", name="show", methods={"GET"})
      */
     public function show(Comment $comment): Response
     {
@@ -37,7 +37,7 @@ class CommentController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="app_back_comment_delete", methods={"POST"})
+     * @Route("/{id}", name="delete", methods={"POST"})
      */
     public function delete(Request $request, Comment $comment, CommentRepository $commentRepository): Response
     {
@@ -49,7 +49,7 @@ class CommentController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/validate", name="app_back_comment_validate", methods={"GET"})
+     * @Route("/{id}/validate", name="validate", methods={"GET"})
      */
     public function validate(Comment $comment, CommentRepository $commentRepository): Response
     {
