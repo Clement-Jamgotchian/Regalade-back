@@ -132,6 +132,14 @@ class ListController extends AbstractController
 
         $editRecipe = $recipeListRepository->findOneBy(["recipe" => $recipe, "user" => $user]);
 
+        if ($recipe === null) {
+            return $this->json(['message' => "Cette recette n'existe pas"], Response::HTTP_NOT_FOUND, []);
+        }
+        
+        if (!$editRecipe) {
+            return $this->json(['message' => "Cette recette n'est pas dans la liste des repas"], Response::HTTP_BAD_REQUEST, []);
+        }
+
         $editedRecipe = $addEditDeleteService->edit($editRecipe, $recipeListRepository, RecipeList::class);
 
         return $this->json($editedRecipe, 200, [], ['groups' => ["recipe_browse", "recipeList_browse"]]);
