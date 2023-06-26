@@ -7,9 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @ORM\Entity(repositoryClass=RecipeRepository::class)
+ * @ORM\HasLifecycleCallbacks
+ * @Vich\Uploadable
  */
 class Recipe
 {
@@ -39,6 +43,12 @@ class Recipe
      * @Groups({"recipe_browse"})
      */
     private $picture;
+
+    /**
+     * @Vich\UploadableField(mapping="recipePicture", fileNameProperty="picture")
+     * @var File|null
+     */
+    private $pictureFile;
 
     /**
      * @ORM\Column(type="integer")
@@ -71,7 +81,7 @@ class Recipe
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ContainsIngredient::class, mappedBy="recipe", cascade={"persist", "remove"})
      * @Groups({"recipe_read"})
      */
     private $containsIngredients;
@@ -95,11 +105,13 @@ class Recipe
 
     /**
      * @ORM\ManyToMany(targetEntity=Allergen::class, mappedBy="recipe")
+     * @Groups({"recipe_browse"})
      */
     private $allergens;
 
     /**
      * @ORM\ManyToMany(targetEntity=Diet::class, mappedBy="recipe")
+     * @Groups({"recipe_browse"})
      */
     private $diets;
 
@@ -115,6 +127,32 @@ class Recipe
      */
     private $portions;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Recipe::class, inversedBy="duplicateRecipes")
+     */
+    private $motherRecipe;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Recipe::class, mappedBy="motherRecipe")
+     * @Groups({"recipe_duplicate"})
+     */
+    private $duplicateRecipes;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isValidate;
+
 
 
     public function __construct()
@@ -124,6 +162,7 @@ class Recipe
         $this->allergens = new ArrayCollection();
         $this->diets = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->duplicateRecipes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -399,7 +438,118 @@ class Recipe
         $this->portions = $portions;
 
         return $this;
-    }   
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Gets triggered only on insert
+
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    /**
+     * Gets triggered every time on update
+
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
+    }
+
+    public function getMotherRecipe(): ?self
+    {
+        return $this->motherRecipe;
+    }
+
+    public function setMotherRecipe(?self $motherRecipe): self
+    {
+        $this->motherRecipe = $motherRecipe;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getDuplicateRecipes(): Collection
+    {
+        return $this->duplicateRecipes;
+    }
+
+    public function addDuplicateRecipe(self $duplicateRecipe): self
+    {
+        if (!$this->duplicateRecipes->contains($duplicateRecipe)) {
+            $this->duplicateRecipes[] = $duplicateRecipe;
+            $duplicateRecipe->setMotherRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDuplicateRecipe(self $duplicateRecipe): self
+    {
+        if ($this->duplicateRecipes->removeElement($duplicateRecipe)) {
+            // set the owning side to null (unless already changed)
+            if ($duplicateRecipe->getMotherRecipe() === $this) {
+                $duplicateRecipe->setMotherRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isIsValidate(): ?bool
+    {
+        return $this->isValidate;
+    }
+
+    public function setIsValidate(?bool $isValidate): self
+    {
+        $this->isValidate = $isValidate;
+
+        return $this;
+    }
+
+    public function setPictureFile(?File $pictureFile = null): void
+    {
+        $this->pictureFile = $pictureFile;
+        if (null !== $pictureFile) {
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getPictureFile()
+    {
+        return $this->pictureFile;
+    }
 
 }
 

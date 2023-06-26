@@ -1,0 +1,8 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        recipePicture:
+            uri_prefix: /images/recipe-picture
+            upload_destination: '%kernel.project_dir%/public/images/recipe-picture'
+            namer: App\Naming\RecipeNamer
