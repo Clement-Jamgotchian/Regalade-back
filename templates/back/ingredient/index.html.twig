@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ingredients{% endblock %}
+
+{% block body %}
+    <h1 class="text-primary fw-bold">Les ingrédients</h1>
+
+    <table class="table table-primary table-striped-columns text-center align-middle">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Lieu de conservation</th>
+                <th>Unité</th>
+                <th>Créé le</th>
+                <th>Modifié le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ingredient in ingredients %}
+            <tr>
+                <td>{{ ingredient.id }}</td>
+                <td>{{ ingredient.name }}</td>
+                <td>{{ ingredient.isCold ? 'Frigo' : 'Placard' }}</td>
+                <td>{{ ingredient.unit }}</td>
+                <td>{{ ingredient.createdAt ? ingredient.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ ingredient.updatedAt ? ingredient.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{{ path('app_back_ingredient_show', {'id': ingredient.id}) }}">Voir</a>
+                    <a class="btn btn-warning" href="{{ path('app_back_ingredient_edit', {'id': ingredient.id}) }}">Editer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">Pas d'ingrédients dans la base</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-secondary" href="{{ path('app_back_ingredient_new') }}">Créer un nouvel ingrédient</a>
+{% endblock %}
