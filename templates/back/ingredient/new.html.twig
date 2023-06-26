@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel ingrédient{% endblock %}
+
+{% block body %}
+    <h1 class="text-primary fw-bold">Créer un nouvel ingrédient</h1>
+
+    {{ include('back/ingredient/_form.html.twig') }}
+
+    <a class="mt-3 col-3 btn btn-primary" href="{{ path('app_back_ingredient_index') }}">Retour</a>
+{% endblock %}
