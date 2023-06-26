@@ -115,7 +115,7 @@ class FridgeController extends AbstractController
     }
 
     /**
-    * @Route("/suggestion", name="suggestion", methods={"POST"})
+    * @Route("/suggestion", name="suggestion", methods={"GET"})
     */
     public function suggestion(SuggestionsByFridgeService $suggestionsByFridgeService): JsonResponse
     {
