@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User{% endblock %}
+{% block title %}Page utilisateur{% endblock %}
 
 {% block body %}
-    <h1>User</h1>
+    <h1 class="text-primary fw-bold">{{user.nickname}}</h1>
 
-    <table class="table">
+    <table class="table table-primary table-striped-columns text-center">
         <tbody>
             <tr>
                 <th>Id</th>
@@ -20,19 +20,19 @@
                 <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
             </tr>
             <tr>
-                <th>Nickname</th>
+                <th>Pseudo</th>
                 <td>{{ user.nickname }}</td>
             </tr>
             <tr>
-                <th>Picture</th>
-                <td>{{ user.picture }}</td>
+                <th>Photo de profil</th>
+                <td>{% if user.picture is not null %}<img src="{{ asset(user.picture) }}" class="img-thumbnail" style="width: 18rem;" alt="">{% else %} Pas d'image{% endif %}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+    <a class="col-4 float-end btn btn-primary" href="{{ path('app_user_index') }}">Retour</a>
 
-    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+    <a class="col-4 float-start btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Editer</a>
 
     {{ include('back/user/_delete_form.html.twig') }}
 {% endblock %}
