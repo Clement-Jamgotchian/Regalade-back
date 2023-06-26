@@ -16,12 +16,12 @@
                 <td>{{ department.name }}</td>
             </tr>
             <tr>
-                <th>CreatedAt</th>
-                <td>{{ department.createdAt ? department.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Créé le</th>
+                <td>{{ department.createdAt ? department.createdAt|date('d-m-Y H:i:s') : '/' }}</td>
             </tr>
             <tr>
-                <th>UpdatedAt</th>
-                <td>{{ department.updatedAt ? department.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Modifié le</th>
+                <td>{{ department.updatedAt ? department.updatedAt|date('d-m-Y H:i:s') : '/' }}</td>
             </tr>
         </tbody>
     </table>
