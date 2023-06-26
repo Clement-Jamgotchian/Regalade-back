@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="370" height="354" viewBox="0 0 370 354" xmlns="http://www.w3.org/2000/svg">
+<rect id="frame" x="0" y="0" width="370" height="354" fill="#f7f7f7" stroke="none" stroke-width="0"/>
+
+<!-- Association is actor of -->
+<g class="page_0_I1fyNJmQ diagram_page" visibility="visible">
+	<line x1="162" y1="269" x2="47" y2="143" stroke="#d6604d" stroke-width="2"/>
+	<text x="80" y="219.12" fill="#2166ac" font-family="Verdana" font-size="12">0,N</text>
+	<line x1="162" y1="51" x2="47" y2="143" stroke="#d6604d" stroke-width="2"/>
+	<text x="108.53" y="110" fill="#2166ac" font-family="Verdana" font-size="12">0,N</text>
+	<g>
+		<path d="M71 118 a14 14 90 0 1 14 14 V143 h-76 V132 a14 14 90 0 1 14 -14" fill="#f4a582" stroke="#f4a582" stroke-width="0"/>
+		<path d="M85 143 v11 a14 14 90 0 1 -14 14 H23 a14 14 90 0 1 -14 -14 V143 H76" fill="#fddbc7" stroke="#fddbc7" stroke-width="0"/>
+		<rect x="9" y="118" width="76" height="50" fill="none" rx="14" stroke="#d6604d" stroke-width="2"/>
+		<line x1="9" y1="143" x2="85" y2="143" stroke="#d6604d" stroke-width="1"/>
+		<text x="17" y="135.75" fill="#000" font-family="Verdana" font-size="12">is actor of</text>
+	</g>
+</g>
+
+<!-- Association has directed -->
+<g class="page_0_I1fyNJmQ diagram_page" visibility="visible">
+	<line x1="162" y1="269" x2="162" y2="143" stroke="#d6604d" stroke-width="2"/>
+	<text x="167" y="185" fill="#2166ac" font-family="Verdana" font-size="12">0,1</text>
+	<line x1="162" y1="51" x2="162" y2="143" stroke="#d6604d" stroke-width="2"/>
+	<text x="167" y="110" fill="#2166ac" font-family="Verdana" font-size="12">0,N</text>
+	<g>
+		<path d="M193 118 a14 14 90 0 1 14 14 V143 h-90 V132 a14 14 90 0 1 14 -14" fill="#f4a582" stroke="#f4a582" stroke-width="0"/>
+		<path d="M207 143 v11 a14 14 90 0 1 -14 14 H131 a14 14 90 0 1 -14 -14 V143 H90" fill="#fddbc7" stroke="#fddbc7" stroke-width="0"/>
+		<rect x="117" y="118" width="90" height="50" fill="none" rx="14" stroke="#d6604d" stroke-width="2"/>
+		<line x1="117" y1="143" x2="207" y2="143" stroke="#d6604d" stroke-width="1"/>
+		<text x="125" y="135.75" fill="#000" font-family="Verdana" font-size="12">has directed</text>
+	</g>
+</g>
+
+<!-- Association has composed for -->
+<g class="page_0_I1fyNJmQ diagram_page" visibility="visible">
+	<line x1="162" y1="269" x2="300" y2="143" stroke="#d6604d" stroke-width="2"/>
+	<text x="222" y="229.17" fill="#2166ac" font-family="Verdana" font-size="12">0,1</text>
+	<line x1="162" y1="51" x2="300" y2="143" stroke="#d6604d" stroke-width="2"/>
+	<text x="223" y="85.44" fill="#2166ac" font-family="Verdana" font-size="12">0,N</text>
+	<g>
+		<path d="M347 118 a14 14 90 0 1 14 14 V143 h-122 V132 a14 14 90 0 1 14 -14" fill="#f4a582" stroke="#f4a582" stroke-width="0"/>
+		<path d="M361 143 v11 a14 14 90 0 1 -14 14 H253 a14 14 90 0 1 -14 -14 V143 H122" fill="#fddbc7" stroke="#fddbc7" stroke-width="0"/>
+		<rect x="239" y="118" width="122" height="50" fill="none" rx="14" stroke="#d6604d" stroke-width="2"/>
+		<line x1="239" y1="143" x2="361" y2="143" stroke="#d6604d" stroke-width="1"/>
+		<text x="246" y="135.75" fill="#000" font-family="Verdana" font-size="12">has composed for</text>
+	</g>
+</g>
+
+<!-- Entity PEOPLE -->
+<g class="page_0_I1fyNJmQ diagram_page" visibility="visible">
+	<g>
+		<rect x="106" y="9" width="112" height="25" fill="#92c5de" stroke="#92c5de" stroke-width="0" opacity="1"/>
+		<rect x="106" y="34" width="112" height="59" fill="#d1e5f0" stroke="#d1e5f0" stroke-width="0" opacity="1"/>
+		<rect x="106" y="9" width="112" height="84" fill="none" stroke="#4393c3" stroke-width="2" opacity="1"/>
+		<line x1="106" y1="34" x2="218" y2="34" stroke="#4393c3" stroke-width="1"/>
+	</g>
+	<text x="139" y="26.75" fill="#000" font-family="Verdana" font-size="12">PEOPLE</text>
+	<text x="111" y="51.8" fill="#000" font-family="Verdana" font-size="12">people_identifier</text>
+	<line x1="111" y1="54" x2="213" y2="54" stroke="#000" stroke-width="1"/>
+	<text x="111" y="68.8" fill="#000" font-family="Verdana" font-size="12">name</text>
+	<text x="111" y="85.8" fill="#000" font-family="Verdana" font-size="12">picture_url</text>
+</g>
+
+<!-- Entity MOVIES -->
+<g class="page_0_I1fyNJmQ diagram_page" visibility="visible">
+	<g>
+		<rect x="107" y="193" width="110" height="25" fill="#92c5de" stroke="#92c5de" stroke-width="0" opacity="1"/>
+		<rect x="107" y="218" width="110" height="127" fill="#d1e5f0" stroke="#d1e5f0" stroke-width="0" opacity="1"/>
+		<rect x="107" y="193" width="110" height="152" fill="none" stroke="#4393c3" stroke-width="2" opacity="1"/>
+		<line x1="107" y1="218" x2="217" y2="218" stroke="#4393c3" stroke-width="1"/>
+	</g>
+	<text x="137" y="210.75" fill="#000" font-family="Verdana" font-size="12">MOVIES</text>
+	<text x="112" y="235.8" fill="#000" font-family="Verdana" font-size="12">movie_identifier</text>
+	<line x1="112" y1="238" x2="211" y2="238" stroke="#000" stroke-width="1"/>
+	<text x="112" y="252.8" fill="#000" font-family="Verdana" font-size="12">title</text>
+	<text x="112" y="269.8" fill="#000" font-family="Verdana" font-size="12">synopsis</text>
+	<text x="112" y="286.8" fill="#000" font-family="Verdana" font-size="12">release_date</text>
+	<text x="112" y="303.8" fill="#000" font-family="Verdana" font-size="12">rating</text>
+	<text x="112" y="320.8" fill="#000" font-family="Verdana" font-size="12">poster_url</text>
+	<text x="112" y="337.8" fill="#000" font-family="Verdana" font-size="12">background_url</text>
+</g>
+</svg>

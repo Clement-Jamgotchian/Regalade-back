@@ -26,6 +26,16 @@ class RecipeController extends AbstractController
     public function index(RecipeRepository $recipeRepository): Response
     {
         return $this->render('back/recipe/index.html.twig', [
+            'recipes' => $recipeRepository->findAll(),
+        ]);
+    }
+
+    /**
+     * @Route("/validation", name="validation", methods={"GET"})
+     */
+    public function browse(RecipeRepository $recipeRepository): Response
+    {
+        return $this->render('back/recipe/validation.html.twig', [
             'recipes' => $recipeRepository->findBy(['isValidate' => null]),
         ]);
     }
