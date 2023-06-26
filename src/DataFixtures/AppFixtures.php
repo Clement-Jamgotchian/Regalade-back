@@ -128,7 +128,7 @@ class AppFixtures extends Fixture
             ÉTAPE 12
             Sur la dernière couche de lasagnes, ne mettre que de la béchamel et recouvrir de fromage râpé. Parsemer quelques noisettes de beurre.
             ÉTAPE 13
-            Enfourner pour environ 25 minutes de cuisson.", 2, 'lasagne.jpg', $allCategories[1], 8],
+            Enfourner pour environ 25 minutes de cuisson.", 2, 'lasagnes.jpg', $allCategories[1], 8],
             ['Gâteau au chocolat fondant rapide', 30, 10, "ÉTAPE 1
             Préchauffez votre four à 180°C (thermostat 6). Dans une casserole, faites fondre le chocolat et le beurre coupé en morceaux à feu très doux.
             ÉTAPE 2

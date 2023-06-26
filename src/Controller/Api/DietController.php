@@ -20,11 +20,8 @@ class DietController extends AbstractController
      */
     public function browse(Request $request, DietRepository $dietRepository): JsonResponse
     {
-        if(!is_null($request->query->get('search'))) {
-            $diets = $dietRepository->findWhere($request->query->get('search'));
-        } else {
-            $diets = $dietRepository->findAll();
-        }
+        $diets = (!is_null($request->query->get('search'))) ? $dietRepository->findWhere($request->query->get('search'))
+                                                            : $dietRepository->findAll();
 
         if (empty($diets)) {
             return $this->json('', Response::HTTP_NO_CONTENT, []);

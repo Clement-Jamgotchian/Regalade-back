@@ -21,11 +21,8 @@ class AllergenController extends AbstractController
      */
     public function browse(Request $request, AllergenRepository $allergenRepository): JsonResponse
     {
-        if(!is_null($request->query->get('search'))) {
-            $allergens = $allergenRepository->findWhere($request->query->get('search'));
-        } else {
-            $allergens = $allergenRepository->findAll();
-        }
+        $allergens = (!is_null($request->query->get('search'))) ? $allergenRepository->findWhere($request->query->get('search'))
+                                                                : $allergenRepository->findAll();
 
         if (empty($allergens)) {
             return $this->json('', Response::HTTP_NO_CONTENT, []);

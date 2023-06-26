@@ -53,42 +53,6 @@ class RecipeRepository extends ServiceEntityRepository
        ;
     }
 
-    public function findMotherRecipes(): array
-    {
-       return $this->createQueryBuilder('r')
-           ->andWhere('r.motherRecipe IS null')
-           ->getQuery()
-           ->getResult()
-       ;
-    }
-
-    public function findTop($category): array
-    {
-       return $this->createQueryBuilder('r')
-           ->innerJoin('r.category', 'c')
-           ->andWhere('c.title = :category')
-           ->andWhere('r.motherRecipe IS null')
-           ->setParameter('category', $category)
-           ->orderBy('r.rating', 'DESC')
-           ->setMaxResults(5)
-           ->getQuery()
-           ->getResult()
-       ;
-    }
-
-    public function findNew(): array
-    {
-       return $this->createQueryBuilder('r')
-           ->andWhere('r.motherRecipe IS null')
-           ->orderBy('r.createdAt', 'DESC')
-           ->setMaxResults(5)
-           ->getQuery()
-           ->getResult()
-       ;
-    }
-
-
-
 //    /**
 //     * @return Recipe[] Returns an array of Recipe objects
 //     */

@@ -6,24 +6,22 @@ use App\Entity\Cart;
 use App\Entity\ContainsIngredient;
 use App\Entity\Fridge;
 use App\Entity\Recipe;
+use App\Entity\RecipeList;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\FridgeRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
 class CompareQuantityService
 {
-    private $entityManagerInterface;
     private $fridgeRepository;
     private $cartRepository;
     /** @var User */
     private $user;
 
-    public function __construct(EntityManagerInterface $entityManagerInterface, FridgeRepository $fridgeRepository, Security $security, CartRepository $cartRepository)
+    public function __construct(FridgeRepository $fridgeRepository, Security $security, CartRepository $cartRepository)
     {
-        $this->entityManagerInterface = $entityManagerInterface;
         $this->fridgeRepository = $fridgeRepository;
         $this->user = $security->getUser();
         $this->cartRepository = $cartRepository;
@@ -45,7 +43,7 @@ class CompareQuantityService
         $portionsWanted = count($this->user->getMembers());
         $proportion = $portionsWanted / $recipePortions;
 
-        $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement2->getIngredient(), $this->user);
+        $ingredientInFridge = $this->fridgeRepository->findOneBy(["ingredient" => $containsIngredientElement2->getIngredient(), "user" => $this->user]);
 
         if (is_null($ingredientInFridge)) {
             return null;
@@ -57,7 +55,8 @@ class CompareQuantityService
 
         $status = ($quantityToSet < 0) ? true : false;
 
-        $ingredient = ($quantityToSet < 0) ? ['quantity' => round(($containsIngredientElement2->getQuantity() * $proportion)), 'ingredient' => $containsIngredientElement2->getIngredient()] : ['quantity' => round($quantityToSet), 'ingredient' => $containsIngredientElement2->getIngredient() ];
+        $ingredient = ($quantityToSet < 0) ? ['quantity' => round(($containsIngredientElement2->getQuantity() * $proportion)), 'ingredient' => $containsIngredientElement2->getIngredient()] 
+                                           : ['quantity' => round($quantityToSet), 'ingredient' => $containsIngredientElement2->getIngredient() ];
 
         return ['status' => $status, 'ingredient' => $ingredient, 'percent' => $percent];
     }
@@ -65,6 +64,7 @@ class CompareQuantityService
     public function checkRecipesList($entityClass, $element = null)
     {
         $recipesList = $this->user->getRecipeLists();
+
         foreach ($recipesList as $recipesListElement) {
             $containsIngredient = $recipesListElement->getRecipe()->getContainsIngredients();
 
@@ -74,7 +74,7 @@ class CompareQuantityService
 
             foreach ($containsIngredient as $containsIngredientElement) {
 
-                $ingredientInFridge = $this->fridgeRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $this->user);
+                $ingredientInFridge = $this->fridgeRepository->findOneBy(["ingredient" => $containsIngredientElement->getIngredient(), "user" => $this->user]);
 
                 if ($entityClass === Cart::class) {
                     $newCart = $this->addToCart($ingredientInFridge, $containsIngredientElement, $proportion);
@@ -98,15 +98,16 @@ class CompareQuantityService
     public function addToCart($ingredientInFridge, $containsIngredientElement, $proportion)
     {
 
-        $quantityToSet = (!is_null($ingredientInFridge)) ? ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity() : $containsIngredientElement->getQuantity() * $proportion;
+        $quantityToSet = (!is_null($ingredientInFridge)) ? ($containsIngredientElement->getQuantity() * $proportion) - $ingredientInFridge->getQuantity() 
+                                                         : $containsIngredientElement->getQuantity() * $proportion;
 
         if ($quantityToSet > 0) {
 
-            $cart = $this->cartRepository->findOneByIngredient($containsIngredientElement->getIngredient(), $this->user) ?? new Cart();
+            $cart = $this->cartRepository->findOneBy(["ingredient" => $containsIngredientElement->getIngredient(), "user" => $this->user]) ?? new Cart();
 
             $cart->setIngredient($containsIngredientElement->getIngredient())
-                    ->setUser($this->user)
-                    ->setQuantity(round($quantityToSet + $cart->getQuantity()));
+                 ->setUser($this->user)
+                 ->setQuantity((round($quantityToSet + $cart->getQuantity()) < 1) ? 1 : round($quantityToSet + $cart->getQuantity()));
 
             $this->cartRepository->add($cart, true);
 
@@ -136,7 +137,7 @@ class CompareQuantityService
             $ingredient = $cartElement->getIngredient();
             $quantity = $cartElement->getQuantity();
 
-            $fridgeElement = $this->fridgeRepository->findOneByIngredient($ingredient, $this->user) ?? new Fridge();
+            $fridgeElement = $this->fridgeRepository->findOneBy(["ingredient" => $ingredient, "user" => $this->user]) ?? new Fridge();
     
             $fridgeElement->setIngredient($ingredient)
                           ->setUser($this->user)
@@ -147,6 +148,36 @@ class CompareQuantityService
         }
 
         return ["Tous les éléments du panier ont été transféré vers le frigo", Response::HTTP_ACCEPTED];
+
+    }
+
+    public function cleanFridge(RecipeList $recipeList)
+    {
+        $fridge = $this->user->getFridges();
+
+        foreach ($fridge as $fridgeElement) {
+
+            foreach ($recipeList->getRecipe()->getContainsIngredients() as $contains)
+            {
+                if ($fridgeElement->getIngredient() === $contains->getIngredient())
+                {
+                    $recipePortions = $recipeList->getRecipe()->getPortions();
+                    $portionsWanted = $recipeList->getPortions();
+                    $proportion = $portionsWanted / $recipePortions;
+
+                    $quantity = ($contains->getQuantity() * $proportion);
+
+                    if (($fridgeElement->getQuantity() - $quantity) < 1) {
+                        $this->fridgeRepository->remove($fridgeElement, true);
+
+                    } else {
+                        $fridgeElement->setQuantity($fridgeElement->getQuantity() - $quantity);
+                        $this->fridgeRepository->add($fridgeElement, true);
+                        
+                    }
+                }
+            }
+        }
 
     }
 

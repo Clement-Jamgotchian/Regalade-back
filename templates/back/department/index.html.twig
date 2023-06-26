@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rayons{% endblock %}
+
+{% block body %}
+    <h1 class="text-primary fw-bold">Les rayons</h1>
+
+    <table class="table table-primary table-striped-columns text-center align-middle">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Créé le</th>
+                <th>Modifié le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for department in departments %}
+            <tr>
+                <td>{{ department.id }}</td>
+                <td>{{ department.name }}</td>
+                <td>{{ department.createdAt ? department.createdAt|date('d-m-Y H:i:s') : '/' }}</td>
+                <td>{{ department.updatedAt ? department.updatedAt|date('d-m-Y H:i:s') : '/' }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{{ path('app_back_department_show', {'id': department.id}) }}">Voir</a>
+                    <a class="btn btn-warning" href="{{ path('app_back_department_edit', {'id': department.id}) }}">Editer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Pas de rayon dans la base</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-secondary" href="{{ path('app_back_department_new') }}">Créer un nouveau rayon</a>
+{% endblock %}

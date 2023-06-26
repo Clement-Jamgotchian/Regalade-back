@@ -21,11 +21,8 @@ class DepartmentController extends AbstractController
      */
     public function browse(Request $request, DepartmentRepository $departmentRepository): JsonResponse
     {
-        if(!is_null($request->query->get('search'))) {
-            $departments = $departmentRepository->findWhere($request->query->get('search'));
-        } else {
-            $departments = $departmentRepository->findAll();
-        }
+        $departments = (!is_null($request->query->get('search'))) ? $departmentRepository->findWhere($request->query->get('search'))
+                                                                  : $departmentRepository->findAll();
 
         if (empty($departments)) {
             return $this->json('', Response::HTTP_NO_CONTENT, []);
