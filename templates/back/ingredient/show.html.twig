@@ -25,11 +25,11 @@
             </tr>
             <tr>
                 <th>Créé le</th>
-                <td>{{ ingredient.createdAt ? ingredient.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ ingredient.createdAt ? ingredient.createdAt|date('d-m-Y H:i:s') : '/' }}</td>
             </tr>
             <tr>
                 <th>Modifié le</th>
-                <td>{{ ingredient.updatedAt ? ingredient.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ ingredient.updatedAt ? ingredient.updatedAt|date('d-m-Y H:i:s') : '/' }}</td>
             </tr>
         </tbody>
     </table>

@@ -24,8 +24,8 @@
                 <td>{{ ingredient.name }}</td>
                 <td>{{ ingredient.isCold ? 'Frigo' : 'Placard' }}</td>
                 <td>{{ ingredient.unit }}</td>
-                <td>{{ ingredient.createdAt ? ingredient.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>{{ ingredient.updatedAt ? ingredient.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ ingredient.createdAt ? ingredient.createdAt|date('d-m-Y H:i:s') : '/' }}</td>
+                <td>{{ ingredient.updatedAt ? ingredient.updatedAt|date('d-m-Y H:i:s') : '/' }}</td>
                 <td>
                     <a class="btn btn-primary" href="{{ path('app_back_ingredient_show', {'id': ingredient.id}) }}">Voir</a>
                     <a class="btn btn-warning" href="{{ path('app_back_ingredient_edit', {'id': ingredient.id}) }}">Editer</a>
