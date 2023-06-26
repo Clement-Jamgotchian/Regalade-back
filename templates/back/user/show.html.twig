@@ -16,8 +16,8 @@
                 <td>{{ user.email }}</td>
             </tr>
             <tr>
-                <th>Roles</th>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                <th>Role</th>
+                <td>{% if "ROLE_ADMIN" in user.roles %} Admin {% else %} Utilisateur {% endif %}</td>
             </tr>
             <tr>
                 <th>Pseudo</th>
