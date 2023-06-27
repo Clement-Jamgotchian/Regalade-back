@@ -154,7 +154,10 @@ class Recipe
      */
     private $isValidate;
 
-
+    /**
+     * @ORM\OneToMany(targetEntity=RecipeList::class, mappedBy="recipe", cascade={"remove"})
+     */
+    private $recipeLists;
 
     public function __construct()
     {
