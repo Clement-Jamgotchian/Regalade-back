@@ -34,7 +34,7 @@ class CompareQuantityService
         return $allCart;
     }
 
-    public function compareQuantityToMakeSuggestion(Recipe $recipe, ContainsIngredient $containsIngredientElement2)
+    public function compareQuantityToMakeSuggestion(Recipe $recipe, ContainsIngredient $containsIngredientElement2, $fridgeElement)
     {
 
         $substract = $this->checkRecipesList(Fridge::class, 0);
@@ -43,15 +43,9 @@ class CompareQuantityService
         $portionsWanted = count($this->user->getMembers());
         $proportion = $portionsWanted / $recipePortions;
 
-        $ingredientInFridge = $this->fridgeRepository->findOneBy(["ingredient" => $containsIngredientElement2->getIngredient(), "user" => $this->user]);
+        $quantityToSet = ($containsIngredientElement2->getQuantity() * $proportion) - ($fridgeElement->getQuantity() - $substract);
 
-        if (is_null($ingredientInFridge)) {
-            return null;
-        }
-
-        $quantityToSet = ($containsIngredientElement2->getQuantity() * $proportion) - ($ingredientInFridge->getQuantity() - $substract);
-
-        $percent = round(($ingredientInFridge->getQuantity() - $substract) / ($containsIngredientElement2->getQuantity() * $proportion), 2);
+        $percent = round(($fridgeElement->getQuantity() - $substract) / ($containsIngredientElement2->getQuantity() * $proportion), 2);
 
         $status = ($quantityToSet < 0) ? true : false;
 

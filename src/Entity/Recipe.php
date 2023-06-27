@@ -100,6 +100,7 @@ class Recipe
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recipes")
+     * @Groups({"recipe_browse"})
      */
     private $user;
 
@@ -153,7 +154,10 @@ class Recipe
      */
     private $isValidate;
 
-
+    /**
+     * @ORM\OneToMany(targetEntity=RecipeList::class, mappedBy="recipe", cascade={"remove"})
+     */
+    private $recipeLists;
 
     public function __construct()
     {

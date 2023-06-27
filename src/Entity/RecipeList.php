@@ -31,7 +31,7 @@ class RecipeList
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Recipe::class)
+     * @ORM\ManyToOne(targetEntity=Recipe::class,  inversedBy="recipeLists")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"recipeList_browse"})
      */

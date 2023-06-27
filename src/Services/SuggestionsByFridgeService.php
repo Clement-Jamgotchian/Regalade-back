@@ -62,15 +62,9 @@ class SuggestionsByFridgeService
 
                     if($usefulIngredient) {
                         
-                        $comparison = $this->compareQuantityService->compareQuantityToMakeSuggestion($recipe, $containsIngredientElement);
-
-                        if (is_null($comparison)) {
-                            $ingredient = [];
-                            $ingredient['quantity'] = $containsIngredientElement->getQuantity();
-                            $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
-                            
-                            $proposition['ingredientsToBuy'][] = $ingredient;
-                        } else if ($comparison['status']) {
+                        $comparison = $this->compareQuantityService->compareQuantityToMakeSuggestion($recipe, $containsIngredientElement, $fridgeElement);
+                        
+                        if ($comparison['status']) {
                             $proposition['ingredientsOk'][] = $comparison['ingredient'];
                             $count += 1;
                         } else {
@@ -87,7 +81,8 @@ class SuggestionsByFridgeService
                     $recipePortions = $recipe->getPortions();
                     $portionsWanted = count($this->user->getMembers());
                     $proportion = $portionsWanted / $recipePortions;
-                    $ingredient['quantity'] = round($containsIngredientElement->getQuantity() * $proportion);
+                    
+                    $ingredient['quantity'] = round(($containsIngredientElement->getQuantity() * $proportion) < 1) ? 1 : round($containsIngredientElement->getQuantity() * $proportion);
                     $ingredient['ingredient'] = $containsIngredientElement->getIngredient();
                     
                     $proposition['ingredientsToBuy'][] = $ingredient;

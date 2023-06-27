@@ -127,6 +127,10 @@ class RecipeController extends AbstractController
     public function add(AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository): JsonResponse
     {
         $recipe = $addEditDeleteService->add($recipeRepository, Recipe::class);
+
+        if (is_null($recipe)) {
+            return $this->json(["message" => "Erreur, votre recette doit contenir au moins un ingrédient"], Response::HTTP_BAD_REQUEST);
+        }
         
         return $this->json($recipe, 200, [], ['groups' => ["recipe_browse", "recipe_read"]]);
     }
@@ -134,7 +138,7 @@ class RecipeController extends AbstractController
     /**
      * @Route("/{id}", name="edit", requirements={"id"="\d+"}, methods={"PUT", "PATCH"})
      */
-    public function edit(?Recipe $recipe, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
+    public function edit(?Recipe $recipe, Request $request, AddEditDeleteService $addEditDeleteService, RecipeRepository $recipeRepository, ContainsIngredientRepository $containsIngredientRepository): JsonResponse
     {
         /** @var User */
         $user = $this->getUser();
@@ -153,6 +157,11 @@ class RecipeController extends AbstractController
             $recipeRepository->add($editedRecipe, true);
 
         } else {
+
+            if (empty(json_decode($request->getContent(), true)['containsIngredients'])) {
+                return $this->json(["message" => "Erreur, votre recette doit contenir au moins un ingrédient"], Response::HTTP_BAD_REQUEST);
+            }
+
             $ingredients = $containsIngredientRepository->findBy(["recipe" => $recipe]);
             foreach ($ingredients as $ingredient) {
                 $containsIngredientRepository->remove($ingredient, true);

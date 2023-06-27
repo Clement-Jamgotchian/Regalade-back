@@ -49,7 +49,9 @@
             <p class="card-text text-warning">En ce moment, {{ recipeToValidate }} recette(s) en attente de validation</p>
 
             {% if recipeToValidate != 0 %} 
-                <a href="{{ path('app_back_recipe_index') }}" class="btn btn-primary">Voir</a>
+                <a href="{{ path('app_back_recipe_validation') }}" class="btn btn-primary">Voir</a>
+            {% else %}
+                <a href="{{ path('app_back_recipe_index') }}" class="btn btn-primary">Voir toutes les recettes</a>    
             {% endif %}
             
             <a href="{{ path('app_back_recipe_new') }}" class="mt-3 btn btn-info">Créer une nouvelle recette</a>
