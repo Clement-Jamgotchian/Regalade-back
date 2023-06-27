@@ -27,3 +27,6 @@ Pour permettre au serveur front de pouvoir envoyer des requêtes à notre API
 
 - [vich/uploader-bundle](https://packagist.org/packages/vich/uploader-bundle) :
 Pour gérer l'upload des images dans le back-office
+
+- [imagine/imagine](https://github.com/php-imagine/Imagine) :
+Pour gérer la redimension des images
