@@ -36,6 +36,12 @@ class AddEditDeleteService
     {
         $newAdd = $this->serializerInterface->deserialize($this->request->getContent(), $entityClass, 'json');
 
+        if ($entityClass === Recipe::class) {
+            if (empty(json_decode($this->request->getContent(), true)['containsIngredients'])) {
+                return null;
+            }
+        }
+
         if ($entityClass === Comment::class) {
             $this->updateRatingService->update($repository, $newAdd->getRecipe(), $newAdd->getRating());
         }
