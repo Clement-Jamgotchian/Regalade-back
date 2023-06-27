@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des recettes{% endblock %}
+{% block title %}Recettes en attente de validation{% endblock %}
 
 {% block body %}
-    <h1 class="text-primary fw-bold">Liste de recettes</h1>
+    <h1 class="text-primary fw-bold">Recettes en attente de validation</h1>
 
     <table class="table table-primary table-striped-columns text-center align-middle">
         <thead>
@@ -13,6 +13,7 @@
                 <th>Date</th>
                 <th>Titre</th>
                 <th>actions</th>
+                <th>validation</th>
                 <th>suppression</th>
             </tr>
         </thead>
@@ -27,7 +28,13 @@
                     <a class="btn btn-primary" href="{{ path('app_back_recipe_show', {'id': recipe.id}) }}">Voir</a>
                     <a class="btn btn-warning" href="{{ path('app_back_recipe_edit', {'id': recipe.id}) }}">Editer</a>
                 </td>
+                <td><a class="btn btn-success" href="{{ path('app_back_recipe_validate', {'id': recipe.id}) }}">Valider</a></td>
                 <td> {{ include('back/recipe/_delete_form.html.twig') }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">Aucune recette à valider pour le moment <br> 
+                <a class="btn btn-secondary" href="{{ path('app_back_recipe_index') }}">Retour à la liste des recettes</a></td>
             </tr>
         {% endfor %}
         </tbody>
