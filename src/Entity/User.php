@@ -22,6 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="integer")
      * @Groups({"user_browse"})
      * @Groups({"member_read"})
+     * @Groups({"recipe_browse"})
      */
     private $id;
 
@@ -50,6 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Groups({"member_read"})
      * @Groups({"comment_read"})
      * @Groups({"recipe_read"})
+     * @Groups({"recipe_browse"})
      */
     private $nickname;
 

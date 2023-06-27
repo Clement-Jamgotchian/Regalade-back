@@ -135,6 +135,6 @@ class RecipeController extends AbstractController
         $recipe->setIsValidate(true);
         $recipeRepository->add($recipe, true);
 
-        return $this->redirectToRoute('app_back_recipe_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_back_recipe_validation', [], Response::HTTP_SEE_OTHER);
     }
 }

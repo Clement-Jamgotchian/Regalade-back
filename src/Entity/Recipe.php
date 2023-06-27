@@ -100,6 +100,7 @@ class Recipe
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recipes")
+     * @Groups({"recipe_browse"})
      */
     private $user;
 
