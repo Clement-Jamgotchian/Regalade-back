@@ -117,7 +117,7 @@ class Recipe
     private $diets;
 
     /**
-     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="recipe")
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="recipe", cascade={"remove"})
      * @Groups({"recipe_read"})
      */
     private $comments;
